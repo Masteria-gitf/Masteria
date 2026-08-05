@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MasterIA — Studio de mastering automatique</title>
+<meta name="description" content="Dépose ton audio, MasterIA le masterise au niveau studio en quelques secondes. Traitement 100% local, aucun envoi sur un serveur.">
+<meta name="keywords" content="mastering audio, mastering en ligne, mastering gratuit, studio automatique, mixage voix instrumental, FCFA">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MasterIA — Studio de mastering automatique">
+<meta property="og:description" content="Dépose ton audio, MasterIA le masterise au niveau studio en quelques secondes. 100% local, rien n'est envoyé sur un serveur.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MasterIA — Studio de mastering automatique">
+<meta name="twitter:description" content="Ton audio, niveau studio, en quelques secondes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --bg: #0c0a08;
+    --panel: #16130f;
+    --panel-2: #1e1a14;
+    --brass: #c98a4b;
+    --brass-dim: #8a6236;
+    --cream: #f2ead9;
+    --muted: #93887a;
+    --line: #2b251c;
+    --vu: #9fc26b;
+    --danger: #d9776a;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--cream);
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-image:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(201,138,75,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 20%, rgba(159,194,107,0.05), transparent 55%);
+  }
+  h1, h2, h3, .display { font-family: 'Fraunces', serif; letter-spacing: -0.01em; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+  a { color: inherit; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 24px 24px; border-bottom: 1px solid var(--line); }
+  .logo { font-family: 'Fraunces', serif; font-weight: 600; font-size: 21px; }
+  .logo span { color: var(--brass); }
+  .logo .plate { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; display: block; margin-top: 2px; }
+  .account-pill { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+  .account-pill b { color: var(--brass); font-weight: 500; }
+  .account-pill button { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 6px 10px; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .account-pill button:hover { border-color: var(--brass-dim); color: var(--cream); }
+  .rech-btn { display: flex; align-items: center; justify-content: space-between; width: 100%;
+    background: var(--panel-2, #1e1a14); border: 1px solid var(--line); color: var(--cream);
+    border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; font-family: 'Inter', sans-serif;
+    font-size: 14px; cursor: pointer; text-decoration: none; }
+  .rech-btn:hover { border-color: var(--vu); }
+  .rech-btn .go { color: var(--vu); font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+  .rech-empty { font-size: 12.5px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+
+  .admin-toggle { background: none; border: 1px solid var(--brass-dim); color: var(--brass); border-radius: 6px; padding: 6px 12px; font-size: 11px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.06em; margin-left: 6px; display: none; }
+  .admin-toggle:hover { background: var(--brass); color: #1a1005; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(8,7,5,0.82); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal-box { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 26px; max-width: 340px; width: 100%; }
+  .admin-badge { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--bg); background: var(--vu); padding: 3px 8px; border-radius: 999px; margin-left: 8px; }
+  .code-list { max-height: 260px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; margin-top: 12px; }
+  .code-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 13px; border-bottom: 1px solid var(--line); font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; }
+  .code-row:last-child { border-bottom: none; }
+  .code-row .c-code { color: var(--cream); }
+  .code-row .c-stars { color: var(--brass); }
+  .code-row .c-used { color: var(--muted); font-size: 10.5px; }
+  .code-row button { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 5px; padding: 4px 9px; font-size: 10.5px; cursor: pointer; font-family: inherit; }
+  .code-row button:hover { border-color: var(--vu); color: var(--vu); }
+  .rech-admin-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .rech-admin-row input[type=text] { margin-bottom: 0; }
+  .rech-admin-row label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .admin-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+  .field-note { font-size: 11.5px; color: var(--muted); margin: -4px 0 12px; }
+
+  .hero { padding: 68px 24px 8px; text-align: center; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 9px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--brass); margin-bottom: 26px; }
+  .eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--vu); box-shadow: 0 0 8px var(--vu); }
+  h1.display { font-size: clamp(34px, 5.6vw, 56px); font-weight: 600; line-height: 1.08; max-width: 760px; margin: 0 auto 22px; }
+  h1.display .accent { color: var(--brass); font-style: italic; font-weight: 500; }
+  .hero p.sub { font-size: 17px; color: var(--muted); max-width: 540px; margin: 0 auto 44px; line-height: 1.6; }
+
+  .meter-panel {
+    max-width: 720px; margin: 0 auto 40px;
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 26px 30px 20px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 20px 50px rgba(0,0,0,0.4);
+    position: relative;
+  }
+  .meter-panel::before {
+    content: 'MASTERIA · SIGNAL PATH · CH.01–02';
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.15em;
+    color: var(--brass-dim); position: absolute; top: 10px; left: 30px;
+  }
+  .meters-row { display: flex; gap: 28px; justify-content: center; align-items: flex-end; padding-top: 18px; }
+  canvas#vuCanvas { width: 100%; height: 130px; display: block; }
+  .meter-caption { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-align: center; margin-top: 12px; text-transform: uppercase; }
+
+  .chain-strip { max-width: 720px; margin: 0 auto 56px; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+  .chain-node { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px; letter-spacing: 0.04em; }
+  .chain-node b { color: var(--brass); }
+  .chain-arrow { color: var(--line); align-self: center; font-size: 12px; }
+
+  section.card-section { padding: 0 24px 40px; }
+  .card { max-width: 620px; margin: 0 auto 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 28px; }
+  .card h3 { font-size: 17px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .card h3 .tag { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--bg); background: var(--brass); padding: 3px 7px; border-radius: 3px; font-weight: 600; }
+  .card h3.tag-vu .tag { background: var(--vu); }
+  .card p.muted { color: var(--muted); font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+
+  input[type=text], input[type=tel], input[type=number], input[type=password], select, textarea {
+    width: 100%; background: var(--panel-2); border: 1px solid var(--line); color: var(--cream);
+    border-radius: 7px; padding: 12px 14px; font-size: 14.5px; margin-bottom: 10px; font-family: 'Inter', sans-serif;
+  }
+  textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--brass-dim); }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+
+  .ticket { border: 1px solid var(--line); border-radius: 8px; padding: 13px 15px; margin-bottom: 10px; }
+  .ticket-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .ticket-subject { font-weight: 600; font-size: 13.5px; }
+  .ticket-meta { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--muted); }
+  .ticket-msg { font-size: 13px; color: var(--cream); line-height: 1.6; white-space: pre-wrap; }
+  .ticket-from { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--brass); margin-bottom: 4px; }
+  .status-badge { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+  .status-badge.nouveau { background: rgba(217,119,106,0.15); color: var(--danger); }
+  .status-badge.traite { background: rgba(159,194,107,0.15); color: var(--vu); }
+  .ticket-actions { margin-top: 10px; }
+  .ticket-actions button { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 5px; padding: 5px 11px; font-size: 11px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; }
+  .ticket-actions button:hover { border-color: var(--vu); color: var(--vu); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--brass); color: #1a1005; font-weight: 600;
+    border: none; border-radius: 7px; padding: 13px 20px; font-size: 14px; cursor: pointer; width: 100%;
+    transition: filter 0.15s ease, transform 0.1s ease; text-decoration: none; font-family: 'Inter', sans-serif;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:active { transform: translateY(1px); }
+  .btn.vu { background: var(--vu); color: #0d1908; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .stats-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .stat-pill { flex: 1; min-width: 128px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 13px 10px; text-align: center; }
+  .stat-pill .val { font-family: 'IBM Plex Mono', monospace; font-size: 21px; font-weight: 600; color: var(--brass); }
+  .stat-pill .lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+  .upload-box { border: 1.5px dashed var(--line); border-radius: 8px; padding: 30px 18px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 8px; }
+  .upload-box.dragover { border-color: var(--brass); background: var(--panel-2); }
+  .upload-box:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+  .upload-box .icon { font-size: 22px; margin-bottom: 8px; color: var(--brass-dim); }
+  .upload-box h4 { font-size: 14.5px; margin-bottom: 4px; font-family: 'Inter', sans-serif; font-weight: 600; }
+  .upload-box p { color: var(--muted); font-size: 12.5px; }
+  .upload-box .file-chip { display: none; align-items: center; justify-content: center; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--vu); margin-top: 6px; }
+  .upload-box .file-chip.show { display: flex; }
+  input[type=file] { display: none; }
+
+  .preset-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .preset-opt { border: 1px solid var(--line); border-radius: 8px; padding: 10px 8px; text-align: center; cursor: pointer; background: var(--panel-2); }
+  .preset-opt.active { border-color: var(--brass); background: rgba(201,138,75,0.12); }
+  .preset-opt .p-name { font-size: 12.5px; font-weight: 600; }
+  .preset-opt .p-desc { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .analysis-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+  .analysis-pill { flex: 1; min-width: 110px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 9px 10px; text-align: center; }
+  .analysis-pill .a-val { font-family: 'IBM Plex Mono', monospace; font-size: 15px; color: var(--vu); font-weight: 600; }
+  .analysis-pill .a-lbl { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+
+  .ab-row { display: flex; gap: 8px; margin: 10px 0; }
+  .ab-btn { flex: 1; background: var(--panel-2); border: 1px solid var(--line); color: var(--muted); border-radius: 7px; padding: 8px; font-size: 12px; font-family: 'IBM Plex Mono', monospace; cursor: pointer; }
+  .ab-btn.active { border-color: var(--vu); color: var(--vu); background: rgba(159,194,107,0.1); }
+
+  canvas.wave-preview { width: 100%; height: 46px; display: block; margin-top: 8px; border-radius: 4px; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+  .progress-track { height: 4px; background: var(--panel-2); border-radius: 999px; overflow: hidden; margin-top: 14px; display: none; }
+  .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--brass), var(--vu)); transition: width 0.3s ease; }
+  .progress-label { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--muted); margin-top: 8px; text-align: center; display: none; letter-spacing: 0.05em; }
+
+  audio { width: 100%; margin: 14px 0; filter: invert(0.85) hue-rotate(180deg); border-radius: 6px; }
+  .msg { font-size: 13px; border-radius: 8px; padding: 10px 13px; margin-top: 10px; display: none; }
+  .msg.error { background: rgba(217,119,106,0.12); color: var(--danger); }
+  .msg.success { background: rgba(159,194,107,0.12); color: var(--vu); }
+
+  footer { border-top: 1px solid var(--line); padding: 30px 24px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+
+  @media (max-width: 720px) { .stats-row { flex-direction: column; } .meters-row { gap: 14px; } }
+  @media (max-width: 480px) {
+    .hero { padding: 44px 18px 8px; }
+    .card { padding: 20px; }
+    .rech-admin-row { grid-template-columns: 1fr; }
+    .chain-strip { gap: 6px; }
+    .chain-node { font-size: 10px; padding: 5px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Master<span>IA</span><span class="plate">Studio automatique · FCFA</span></div>
+  <div style="display:flex; align-items:center;">
+    <div class="account-pill" id="accountPill">Non connecté</div>
+    <button class="admin-toggle" id="adminToggleBtn">Admin</button>
+  </div>
+</nav>
+
+<section class="hero wrap">
+  <div class="eyebrow">Mastering audio en temps réel dans le navigateur</div>
+  <h1 class="display">Ton audio, <span class="accent">niveau studio</span>,<br>en quelques secondes</h1>
+  <p class="sub">Dépose ton fichier. MasterIA applique une vraie chaîne de traitement — égalisation, compression, limiteur et calibration du niveau sonore — pour un rendu prêt à publier.</p>
+
+  <div class="meter-panel">
+    <div class="meters-row"><canvas id="vuCanvas" width="640" height="160"></canvas></div>
+    <div class="meter-caption">Aperçu du signal — le vrai traitement s'applique à ton fichier</div>
+  </div>
+
+  <div class="chain-strip">
+    <div class="chain-node">Entrée</div><div class="chain-arrow">→</div>
+    <div class="chain-node">Passe-haut <b>30 Hz</b></div><div class="chain-arrow">→</div>
+    <div class="chain-node">EQ 3 bandes</div><div class="chain-arrow">→</div>
+    <div class="chain-node">Compresseur</div><div class="chain-arrow">→</div>
+    <div class="chain-node">Limiteur</div><div class="chain-arrow">→</div>
+    <div class="chain-node">Normalisation</div>
+  </div>
+
+  <div class="chain-strip" style="margin-top:-32px;">
+    <div class="chain-node">◎ Mastering — <b>2000 FCFA</b></div>
+    <div class="chain-node">🎚 Production complète — <b>5000 FCFA</b></div>
+    <div class="chain-node">🔒 100% local, rien n'est envoyé sur un serveur</div>
+  </div>
+</section>
+
+<!-- ============ CONNEXION ============ -->
+<section class="card-section wrap" id="loginSection">
+  <div class="card">
+    <h3><span class="tag">01</span> Connexion</h3>
+    <p class="muted">Un compte = un email. Crée un compte ou connecte-toi avec un email et un mot de passe.</p>
+    <div class="msg error" id="loginError"></div>
+    <div class="msg success" id="loginSuccess"></div>
+    <input type="text" id="emailInput" placeholder="Adresse email" autocomplete="email">
+    <input type="password" id="passwordInput" placeholder="Mot de passe (8 caractères minimum)" autocomplete="current-password">
+    <button class="btn" id="signupBtn">Créer un compte</button>
+    <button class="btn vu" id="signinBtn" style="margin-top:8px;">Se connecter</button>
+    <p style="text-align:center; margin-top:12px;">
+      <a href="#" id="forgotPwdLink" style="font-size:12.5px; color:var(--muted); text-decoration:underline;">Mot de passe oublié ?</a>
+    </p>
+  </div>
+</section>
+
+<!-- ============ TABLEAU DE BORD ============ -->
+<section class="card-section wrap" id="dashboard" style="display:none;">
+
+  <div class="card">
+    <div class="stats-row">
+      <div class="stat-pill"><div class="val" id="starsVal">0</div><div class="lbl">Stars</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">02</span> Mastering classique</h3>
+    <p class="muted">10 stars (2000 FCFA) par audio. Traitement 100% local à ton appareil — ton fichier n'est envoyé à aucun serveur.</p>
+    <label class="sr-only" for="presetMasterGroup">Intensité du mastering</label>
+    <div class="preset-row" id="presetMasterGroup" role="radiogroup" aria-label="Intensité du mastering">
+      <div class="preset-opt" data-preset="doux" role="radio" aria-checked="false" tabindex="0"><div class="p-name">Doux</div><div class="p-desc">Dynamique préservée</div></div>
+      <div class="preset-opt active" data-preset="standard" role="radio" aria-checked="true" tabindex="0"><div class="p-name">Standard</div><div class="p-desc">Équilibré, streaming</div></div>
+      <div class="preset-opt" data-preset="loud" role="radio" aria-checked="false" tabindex="0"><div class="p-name">Club</div><div class="p-desc">Maximum de pression</div></div>
+    </div>
+    <div class="upload-box" id="uploadBoxMaster" tabindex="0" role="button" aria-label="Déposer ou choisir un fichier audio à masteriser">
+      <div class="icon">◎</div>
+      <h4>Dépose ton fichier audio ici</h4>
+      <p>MP3, WAV, M4A, OGG, FLAC — 60 Mo max</p>
+      <div class="file-chip" id="masterFileChip"></div>
+      <input type="file" id="fileInputMaster" accept=".mp3,.wav,.m4a,.ogg,.flac,audio/*">
+    </div>
+    <canvas class="wave-preview" id="masterWavePreview" style="display:none;" width="600" height="46"></canvas>
+    <div class="progress-track" id="progressTrackMaster"><div class="progress-bar" id="progressBarMaster"></div></div>
+    <div class="progress-label" id="progressLabelMaster" aria-live="polite">Traitement en cours…</div>
+    <div class="msg error" id="masterError" role="alert"></div>
+    <div id="masterResult" style="display:none;">
+      <div class="analysis-row" id="masterAnalysis"></div>
+      <div class="ab-row">
+        <button type="button" class="ab-btn" id="masterAbBefore">Avant</button>
+        <button type="button" class="ab-btn active" id="masterAbAfter">Après (masterisé)</button>
+      </div>
+      <audio id="resultAudioMaster" controls></audio>
+      <a class="btn" id="downloadBtnMaster" download="audio_masterise.wav">Télécharger le fichier (.wav)</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="tag-vu"><span class="tag">03</span> Recharger des stars</h3>
+    <p class="muted">Choisis un rechargeur ci-dessous pour acheter tes stars sur WhatsApp, puis reviens saisir le code reçu ici.</p>
+    <div id="rechargeursBox" style="margin-bottom:16px;"></div>
+    <input type="text" id="codeInput" placeholder="Code de recharge (ex: MIA3-A1B2C3D4E5)">
+    <button class="btn vu" id="redeemBtn">Valider le code</button>
+    <div class="msg error" id="redeemError"></div>
+    <div class="msg success" id="redeemSuccess"></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">04</span> Production complète</h3>
+    <p class="muted">Dépose ton instrumental et ta prise de voix, MasterIA fait le mixage puis applique la même chaîne de mastering. 5000 FCFA (25 stars) par production.</p>
+    <div class="upload-box" id="uploadBoxInstru" tabindex="0" role="button" aria-label="Déposer ou choisir l'instrumental">
+      <div class="icon">🎹</div><h4>Instrumental</h4>
+      <p id="instruFileName">MP3, WAV — clique ou glisse-dépose</p>
+      <input type="file" id="fileInputInstru" accept=".mp3,.wav,.m4a,.ogg,.flac,audio/*">
+    </div>
+    <div class="upload-box" id="uploadBoxVoix" tabindex="0" role="button" aria-label="Déposer ou choisir la prise de voix">
+      <div class="icon">🎤</div><h4>Prise de voix</h4>
+      <p id="voixFileName">MP3, WAV — clique ou glisse-dépose</p>
+      <input type="file" id="fileInputVoix" accept=".mp3,.wav,.m4a,.ogg,.flac,audio/*">
+    </div>
+    <button class="btn" id="launchProductionBtn">Lancer la production</button>
+    <div class="progress-track" id="progressTrackProd"><div class="progress-bar" id="progressBarProd"></div></div>
+    <div class="progress-label" id="progressLabelProd" aria-live="polite">Traitement en cours…</div>
+    <div class="msg error" id="prodError" role="alert"></div>
+    <div id="prodResult" style="display:none;">
+      <div class="analysis-row" id="prodAnalysis"></div>
+      <audio id="resultAudioProd" controls></audio>
+      <a class="btn" id="downloadBtnProd" download="production_masteria.wav">Télécharger le fichier (.wav)</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">05</span> Instrumental automatique</h3>
+    <p class="muted">Dépose ta voix seule (a cappella, sans musique derrière). MasterIA détecte la tonalité et le tempo de ton chant, choisis le style, puis génère et masterise une composition complète (batterie, basse, accords, et instruments spécifiques au style) dans ce ton et ce tempo. 25 stars (5000 FCFA) par génération.</p>
+    <p class="hint" style="margin:-8px 0 14px; font-size:11px; color:var(--muted);">⚠️ Génération automatique par synthèse : une composition fonctionnelle et stylée dans le bon ton et le bon tempo, pas une composition sur-mesure d'un vrai beatmaker.</p>
+    <label style="display:block; font-size:12.5px; color:var(--muted); margin-bottom:6px;">Style musical</label>
+    <select id="genreSelect" style="width:100%; margin-bottom:14px; background:var(--bg2,#161310); color:var(--cream); border:1px solid var(--line); border-radius:8px; padding:11px 12px; font-family:inherit; font-size:14px;">
+      <option value="rap">Rap</option>
+      <option value="rnb">RnB</option>
+      <option value="pop">Pop</option>
+      <option value="afrobeat">Afrobeat</option>
+      <option value="melo">Mélo (ballade)</option>
+      <option value="coupe_decale">Coupé-décalé</option>
+      <option value="afrotrap">Afro-trap</option>
+      <option value="gospel">Gospel</option>
+      <option value="dancehall">Dancehall</option>
+      <option value="amapiano">Amapiano</option>
+    </select>
+    <div class="upload-box" id="uploadBoxInstruGen" tabindex="0" role="button" aria-label="Déposer ou choisir la voix seule">
+      <div class="icon">🎼</div>
+      <h4>Dépose ta voix seule ici</h4>
+      <p>MP3, WAV, M4A — 60 Mo max</p>
+      <div class="file-chip" id="instruGenFileChip"></div>
+      <input type="file" id="fileInputInstruGen" accept=".mp3,.wav,.m4a,.ogg,.flac,audio/*">
+    </div>
+    <div class="progress-track" id="progressTrackInstruGen"><div class="progress-bar" id="progressBarInstruGen"></div></div>
+    <div class="progress-label" id="progressLabelInstruGen" aria-live="polite">Traitement en cours…</div>
+    <div class="msg error" id="instruGenError" role="alert"></div>
+    <div id="instruGenResult" style="display:none;">
+      <p class="hint" id="instruGenInfo" style="margin-bottom:10px;"></p>
+      <div class="analysis-row" id="instruGenAnalysis"></div>
+      <audio id="resultAudioInstruGen" controls></audio>
+      <a class="btn" id="downloadBtnInstruGen" download="instrumental_masteria.wav">Télécharger l'instrumental (.wav)</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">06</span> Support</h3>
+    <p class="muted">Une question, un problème avec un audio ou une recharge ? Écris-nous, on te répond directement sur ton email.</p>
+    <input type="text" id="supportSubject" placeholder="Sujet (ex: Code de recharge refusé)">
+    <textarea id="supportMessage" placeholder="Décris ton problème…"></textarea>
+    <button class="btn vu" id="supportSendBtn">Envoyer le message</button>
+    <div class="msg error" id="supportError"></div>
+    <div class="msg success" id="supportSuccess"></div>
+    <div id="myTickets" style="margin-top:16px;"></div>
+  </div>
+
+</section>
+
+<!-- ============ ADMIN (visible uniquement si isAdmin === true) ============ -->
+<section class="card-section wrap" id="adminSection" style="display:none;">
+
+  <div class="card">
+    <h3 class="tag-vu"><span class="tag">A</span> Statistiques</h3>
+    <div class="admin-stats">
+      <div class="stat-pill"><div class="val" id="statUsers">–</div><div class="lbl">Comptes créés</div></div>
+      <div class="stat-pill"><div class="val" id="statCodesUnused">–</div><div class="lbl">Codes non utilisés</div></div>
+      <div class="stat-pill"><div class="val" id="statCodesUsed">–</div><div class="lbl">Codes utilisés</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">B</span> Générer des codes de recharge</h3>
+    <p class="muted">Crée des codes à donner à tes rechargeurs. Chaque code est à usage unique et crédite le nombre d'étoiles choisi sur le compte qui le saisit.</p>
+    <input type="number" id="genStars" placeholder="Étoiles par code (ex: 10)" min="1">
+    <input type="number" id="genQty" placeholder="Nombre de codes à générer (ex: 5)" min="1" max="50">
+    <input type="text" id="genNote" placeholder="Note (ex: nom du rechargeur) — optionnel">
+    <button class="btn vu" id="genCodesBtn">Générer les codes</button>
+    <div class="msg error" id="genError"></div>
+    <div class="msg success" id="genSuccess"></div>
+    <div id="genResultList"></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">C</span> Codes non utilisés</h3>
+    <p class="muted">Liste des codes en circulation, du plus récent au plus ancien.</p>
+    <button class="btn" id="refreshCodesBtn" style="margin-bottom:4px;">Actualiser la liste</button>
+    <div class="code-list" id="codeList"><p class="rech-empty" style="padding:12px;">Clique sur "Actualiser" pour charger.</p></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">D</span> Rechargeurs</h3>
+    <p class="muted">Jusqu'à 5 rechargeurs affichés aux utilisateurs pour l'achat de stars via WhatsApp. Numéro au format international sans le "+" (ex: 22997000000).</p>
+    <div id="rechAdminForm"></div>
+    <button class="btn vu" id="saveRechBtn">Enregistrer les rechargeurs</button>
+    <div class="msg error" id="rechAdminError"></div>
+    <div class="msg success" id="rechAdminSuccess"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="tag-vu"><span class="tag">E</span> Messages support</h3>
+    <p class="muted">Messages envoyés par les clients depuis leur espace, du plus récent au plus ancien.</p>
+    <div class="stats-row" style="margin-bottom:14px;">
+      <div class="stat-pill"><div class="val" id="statSupportNew">–</div><div class="lbl">Non traités</div></div>
+    </div>
+    <button class="btn" id="refreshSupportBtn" style="margin-bottom:4px;">Actualiser les messages</button>
+    <div id="supportList" style="margin-top:12px;"><p class="rech-empty">Clique sur "Actualiser" pour charger.</p></div>
+  </div>
+
+</section>
+
+<footer>
+  MasterIA — traitement audio 100% local, aucun fichier envoyé à un serveur · Compte lié à ton email
+  <br><a href="#" id="adminEntryLink" style="color:var(--muted); text-decoration:underline; font-size:11px;">Accès admin</a>
+</footer>
+
+<div id="adminLoginModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <h3 style="margin-bottom:6px;">Accès admin</h3>
+    <p class="muted" style="font-size:12.5px; margin-bottom:14px;">Entre le mot de passe administrateur.</p>
+    <input type="password" id="adminPasswordInput" placeholder="Mot de passe admin">
+    <div class="msg error" id="adminLoginError"></div>
+    <button class="btn vu" id="adminLoginSubmit">Se connecter</button>
+    <button class="btn" id="adminLoginCancel" style="margin-top:8px; background:none; border:1px solid var(--line); color:var(--muted);">Annuler</button>
+  </div>
+</div>
+
+<script type="module">
+// ============================================================
+// CONFIGURATION FIREBASE — comptes et compteurs uniquement
+// (aucun fichier audio ne transite par Firebase : tout le
+// traitement se fait dans le navigateur, voir plus bas)
+// ============================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  sendPasswordResetEmail, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, runTransaction, onSnapshot, serverTimestamp,
+  collection, query, orderBy, limit, getDocs, getCountFromServer, where
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCCrUoNEpTMie8pjJLe5JcO3FmKf5-05WI",
+  authDomain: "masteria-a3623.firebaseapp.com",
+  projectId: "masteria-a3623",
+  storageBucket: "masteria-a3623.firebasestorage.app",
+  messagingSenderId: "750006273525",
+  appId: "1:750006273525:web:3508dbc65706b4c4b94cbc"
+};
+
+const MASTERING_COST_STARS = 10;
+const PRODUCTION_COST_STARS = 25;
+const INSTRUGEN_COST_STARS = 25;
+const MAX_FILE_SIZE = 60 * 1024 * 1024; // 60 Mo, cohérent avec le texte affiché
+const ACCEPTED_EXT = /\.(mp3|wav|m4a|ogg|flac)$/i;
+
+// ------------------------------------------------------------
+// Vérification de compatibilité navigateur — évite des erreurs
+// cryptiques sur les vieux navigateurs qui n'ont pas Web Audio.
+// ------------------------------------------------------------
+if (!(window.AudioContext || window.webkitAudioContext) || !window.OfflineAudioContext) {
+  const warn = document.createElement("div");
+  warn.style.cssText = "background:#d9776a; color:#1a0705; text-align:center; padding:10px 14px; font-family:'IBM Plex Mono',monospace; font-size:12.5px;";
+  warn.textContent = "Ton navigateur ne supporte pas le traitement audio requis. Utilise une version récente de Chrome, Firefox, Edge ou Safari.";
+  document.body.prepend(warn);
+}
+
+function formatBytes(bytes) {
+  if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + " Ko";
+  return (bytes / (1024 * 1024)).toFixed(1) + " Mo";
+}
+function formatDuration(sec) {
+  if (!isFinite(sec)) return "";
+  const m = Math.floor(sec / 60), s = Math.round(sec % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+// Dessine un aperçu de forme d'onde simplifié dans un <canvas>,
+// à partir des pics min/max par colonne de pixels.
+function drawWaveform(canvas, audioBuffer) {
+  canvas.style.display = "block";
+  const ctx2 = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  ctx2.clearRect(0, 0, w, h);
+  const data = audioBuffer.getChannelData(0);
+  const step = Math.ceil(data.length / w);
+  ctx2.strokeStyle = "#c98a4b";
+  ctx2.lineWidth = 1;
+  const mid = h / 2;
+  for (let x = 0; x < w; x++) {
+    let min = 1, max = -1;
+    const start = x * step;
+    for (let i = 0; i < step; i++) {
+      const v = data[start + i] || 0;
+      if (v < min) min = v;
+      if (v > max) max = v;
+    }
+    ctx2.beginPath();
+    ctx2.moveTo(x, mid + min * mid * 0.92);
+    ctx2.lineTo(x, mid + max * mid * 0.92);
+    ctx2.stroke();
+  }
+}
+
+// Attache le glisser-déposer à une zone d'upload (elle avait déjà
+// le style .dragover mais aucun listener — le drag & drop ne
+// fonctionnait donc pas du tout).
+function wireDropZone(box, input, onFile) {
+  ["dragenter", "dragover"].forEach((evt) =>
+    box.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); box.classList.add("dragover"); })
+  );
+  ["dragleave", "dragend"].forEach((evt) =>
+    box.addEventListener(evt, (e) => { e.preventDefault(); box.classList.remove("dragover"); })
+  );
+  box.addEventListener("drop", (e) => {
+    e.preventDefault(); e.stopPropagation();
+    box.classList.remove("dragover");
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!file) return;
+    if (!ACCEPTED_EXT.test(file.name) && !file.type.startsWith("audio/")) {
+      onFile(null, "Format non supporté. Utilise MP3, WAV, M4A, OGG ou FLAC.");
+      return;
+    }
+    onFile(file, null);
+  });
+  box.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); }
+  });
+}
+
+// Analyse un AudioBuffer : pic (dBFS) et RMS (approximation du
+// niveau perçu, en dB) — affiché à l'utilisateur après mastering
+// pour qu'il voie objectivement ce qui a changé.
+function analyzeBuffer(buffer) {
+  let peak = 0, sumSquares = 0, n = 0;
+  for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+    const data = buffer.getChannelData(ch);
+    for (let i = 0; i < data.length; i++) {
+      const v = Math.abs(data[i]);
+      if (v > peak) peak = v;
+      sumSquares += data[i] * data[i];
+      n++;
+    }
+  }
+  const rms = Math.sqrt(sumSquares / Math.max(1, n));
+  return {
+    peakDb: 20 * Math.log10(peak || 1e-8),
+    rmsDb: 20 * Math.log10(rms || 1e-8),
+    duration: buffer.duration,
+  };
+}
+function renderAnalysisPills(container, analysis) {
+  container.innerHTML = `
+    <div class="analysis-pill"><div class="a-val">${analysis.peakDb.toFixed(1)} dB</div><div class="a-lbl">Pic</div></div>
+    <div class="analysis-pill"><div class="a-val">${analysis.rmsDb.toFixed(1)} dB</div><div class="a-lbl">Niveau moyen</div></div>
+    <div class="analysis-pill"><div class="a-val">${formatDuration(analysis.duration)}</div><div class="a-lbl">Durée</div></div>
+  `;
+}
+
+// ------------------------------------------------------------
+// Presets d'intensité de mastering — choisis par l'utilisateur.
+// "doux" garde de la dynamique (moins de compression, cible plus
+// basse), "standard" vise le niveau habituel des plateformes de
+// streaming, "loud" pousse la pression sonore façon club/DJ.
+// ------------------------------------------------------------
+const MASTER_PRESETS = {
+  doux:     { ratioMul: 0.7, thresholdOffset: 3,  makeupMul: 0.85, limiterThreshold: -2.5, targetRmsDb: -17,   targetPeakDb: -1.5, widthMul: 1.05 },
+  standard: { ratioMul: 1.0, thresholdOffset: 0,  makeupMul: 1.0,  limiterThreshold: -1.5, targetRmsDb: -14,   targetPeakDb: -1.0, widthMul: 1.12 },
+  loud:     { ratioMul: 1.4, thresholdOffset: -3, makeupMul: 1.25, limiterThreshold: -0.8, targetRmsDb: -10.5, targetPeakDb: -0.5, widthMul: 1.2  },
+};
+let currentMasterPreset = "standard";
+document.querySelectorAll("#presetMasterGroup .preset-opt").forEach((opt) => {
+  opt.addEventListener("click", () => selectMasterPreset(opt.dataset.preset));
+  opt.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectMasterPreset(opt.dataset.preset); }
+  });
+});
+function selectMasterPreset(name) {
+  currentMasterPreset = name;
+  document.querySelectorAll("#presetMasterGroup .preset-opt").forEach((el) => {
+    const active = el.dataset.preset === name;
+    el.classList.toggle("active", active);
+    el.setAttribute("aria-checked", active ? "true" : "false");
+  });
+}
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Traduit les erreurs Firebase (codes techniques en anglais) en messages
+// clairs pour l'utilisateur, plutôt que d'afficher le message brut de l'API.
+function frenchAuthError(e) {
+  const code = e && e.code;
+  const map = {
+    "auth/invalid-email": "Adresse email invalide.",
+    "auth/missing-email": "Entre une adresse email.",
+    "auth/missing-password": "Entre un mot de passe.",
+    "auth/email-already-in-use": "Un compte existe déjà avec cet email. Utilise \"Se connecter\".",
+    "auth/weak-password": "Mot de passe trop court (8 caractères minimum).",
+    "auth/user-not-found": "Aucun compte avec cet email. Utilise \"Créer un compte\".",
+    "auth/wrong-password": "Mot de passe incorrect.",
+    "auth/invalid-credential": "Email ou mot de passe incorrect.",
+    "auth/too-many-requests": "Trop de tentatives. Réessaie dans quelques minutes.",
+    "auth/network-request-failed": "Problème de connexion internet.",
+  };
+  return map[code] || (e && e.message) || "Une erreur est survenue.";
+}
+
+// ------------------------------------------------------------
+// Connexion par email + mot de passe
+// ------------------------------------------------------------
+const emailInput = document.getElementById("emailInput");
+const passwordInput = document.getElementById("passwordInput");
+const signupBtn = document.getElementById("signupBtn");
+const signinBtn = document.getElementById("signinBtn");
+const forgotPwdLink = document.getElementById("forgotPwdLink");
+const loginError = document.getElementById("loginError");
+const loginSuccess = document.getElementById("loginSuccess");
+
+function readCredentials() {
+  loginError.style.display = "none"; loginSuccess.style.display = "none";
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  if (!email || !password) {
+    loginError.textContent = "Entre un email et un mot de passe.";
+    loginError.style.display = "block";
+    return null;
+  }
+  return { email, password };
+}
+
+signupBtn.addEventListener("click", async () => {
+  const creds = readCredentials();
+  if (!creds) return;
+  signupBtn.disabled = true; signupBtn.textContent = "Création…";
+  try {
+    await createUserWithEmailAndPassword(auth, creds.email, creds.password);
+  } catch (e) {
+    loginError.textContent = frenchAuthError(e);
+    loginError.style.display = "block";
+  } finally {
+    signupBtn.disabled = false; signupBtn.textContent = "Créer un compte";
+  }
+});
+
+signinBtn.addEventListener("click", async () => {
+  const creds = readCredentials();
+  if (!creds) return;
+  signinBtn.disabled = true; signinBtn.textContent = "Connexion…";
+  try {
+    await signInWithEmailAndPassword(auth, creds.email, creds.password);
+  } catch (e) {
+    loginError.textContent = frenchAuthError(e);
+    loginError.style.display = "block";
+  } finally {
+    signinBtn.disabled = false; signinBtn.textContent = "Se connecter";
+  }
+});
+
+forgotPwdLink.addEventListener("click", async (ev) => {
+  ev.preventDefault();
+  loginError.style.display = "none"; loginSuccess.style.display = "none";
+  const email = emailInput.value.trim();
+  if (!email) {
+    loginError.textContent = "Entre ton email ci-dessus, puis clique à nouveau sur ce lien.";
+    loginError.style.display = "block";
+    return;
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    loginSuccess.textContent = "Email de réinitialisation envoyé (vérifie aussi tes spams).";
+    loginSuccess.style.display = "block";
+  } catch (e) {
+    loginError.textContent = frenchAuthError(e);
+    loginError.style.display = "block";
+  }
+});
+
+async function ensureUserDoc(uid) {
+  const ref = doc(db, "users", uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      stars: 0, isAdmin: false, createdAt: serverTimestamp(),
+    });
+  }
+}
+
+let unsubscribeUser = null;
+onAuthStateChanged(auth, async (user) => {
+  const accountPill = document.getElementById("accountPill");
+  const loginSection = document.getElementById("loginSection");
+  const dashboard = document.getElementById("dashboard");
+  if (unsubscribeUser) { unsubscribeUser(); unsubscribeUser = null; }
+
+  if (user) {
+    await ensureUserDoc(user.uid);
+    loginSection.style.display = "none";
+    dashboard.style.display = "block";
+    accountPill.innerHTML = `<b>${user.email || ""}</b>`;
+    const btn = document.createElement("button");
+    btn.textContent = "Se déconnecter";
+    btn.addEventListener("click", () => signOut(auth));
+    accountPill.appendChild(btn);
+
+    unsubscribeUser = onSnapshot(doc(db, "users", user.uid), (snap) => {
+      if (!snap.exists()) return;
+      const d = snap.data();
+      document.getElementById("starsVal").textContent = d.stars ?? 0;
+
+      const adminToggleBtn = document.getElementById("adminToggleBtn");
+      if (d.isAdmin === true) {
+        adminToggleBtn.style.display = "inline-block";
+        if (!accountPill.querySelector(".admin-badge")) {
+          const badge = document.createElement("span");
+          badge.className = "admin-badge"; badge.textContent = "Admin";
+          accountPill.insertBefore(badge, accountPill.querySelector("button"));
+        }
+      } else {
+        adminToggleBtn.style.display = "none";
+        showDashboardView();
+      }
+    });
+
+    loadRechargeurs();
+    loadMyTickets();
+  } else {
+    loginSection.style.display = "block";
+    dashboard.style.display = "none";
+    document.getElementById("adminSection").style.display = "none";
+    document.getElementById("adminToggleBtn").style.display = "none";
+    document.getElementById("adminToggleBtn").textContent = "Admin";
+    accountPill.textContent = "Non connecté";
+  }
+});
+
+// ------------------------------------------------------------
+// Bascule Dashboard ↔ Admin (comme LudoWin : tout sur la même page)
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+// Accès admin fixe — toujours visible en bas de page.
+// Utilise ton compte email habituel : il te suffit de taper
+// le mot de passe, l'email est déjà connu.
+// ------------------------------------------------------------
+const ADMIN_EMAIL = "cedricsehoue0@gmail.com";
+
+const adminEntryLink = document.getElementById("adminEntryLink");
+const adminLoginModal = document.getElementById("adminLoginModal");
+const adminPasswordInput = document.getElementById("adminPasswordInput");
+const adminLoginError = document.getElementById("adminLoginError");
+const adminLoginSubmit = document.getElementById("adminLoginSubmit");
+const adminLoginCancel = document.getElementById("adminLoginCancel");
+
+adminEntryLink.addEventListener("click", (e) => {
+  e.preventDefault();
+  adminPasswordInput.value = "";
+  adminLoginError.style.display = "none";
+  adminLoginModal.style.display = "flex";
+  adminPasswordInput.focus();
+});
+adminLoginCancel.addEventListener("click", () => { adminLoginModal.style.display = "none"; });
+adminPasswordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") adminLoginSubmit.click(); });
+
+adminLoginSubmit.addEventListener("click", async () => {
+  const pass = adminPasswordInput.value;
+  adminLoginError.style.display = "none";
+  if (!pass) {
+    adminLoginError.textContent = "Entre le mot de passe.";
+    adminLoginError.style.display = "block";
+    return;
+  }
+  adminLoginSubmit.disabled = true;
+  adminLoginSubmit.textContent = "Connexion…";
+  try {
+    const cred = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, pass);
+    const snap = await getDoc(doc(db, "users", cred.user.uid));
+    const isAdminFlag = snap.exists() && snap.data().isAdmin === true;
+    if (!isAdminFlag) {
+      adminLoginError.textContent =
+        `Ce compte n'a pas isAdmin=true dans Firestore. Vérifie la collection "users", document ${cred.user.uid}, champ isAdmin (type booléen, valeur true).`;
+      adminLoginError.style.display = "block";
+      return;
+    }
+    adminLoginModal.style.display = "none";
+    showAdminView();
+  } catch (e) {
+    adminLoginError.textContent = frenchAuthError(e);
+    adminLoginError.style.display = "block";
+  } finally {
+    adminLoginSubmit.disabled = false;
+    adminLoginSubmit.textContent = "Se connecter";
+  }
+});
+
+function showDashboardView() {
+  document.getElementById("adminSection").style.display = "none";
+  document.getElementById("adminToggleBtn").textContent = "Admin";
+}
+function showAdminView() {
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("adminSection").style.display = "block";
+  document.getElementById("adminToggleBtn").textContent = "← Retour au site";
+  loadAdminStats();
+  loadRechAdminForm();
+  loadSupportList();
+}
+document.getElementById("adminToggleBtn").addEventListener("click", () => {
+  const isAdminView = document.getElementById("adminSection").style.display === "block";
+  if (isAdminView) showDashboardView(); else showAdminView();
+});
+
+// ------------------------------------------------------------
+// Rechargeurs (bouton WhatsApp pour acheter des stars)
+// ------------------------------------------------------------
+const RECHARGEUR_SLOTS = ["1", "2", "3", "4", "5"];
+async function loadRechargeurs() {
+  const box = document.getElementById("rechargeursBox");
+  box.innerHTML = `<p class="rech-empty">Chargement des rechargeurs…</p>`;
+  const actifs = [];
+  for (const slot of RECHARGEUR_SLOTS) {
+    try {
+      const snap = await getDoc(doc(db, "rechargeurs", slot));
+      if (snap.exists() && snap.data().actif && snap.data().whatsapp) actifs.push(snap.data());
+    } catch (_) { /* pas grave, on affiche ce qu'on a pu récupérer */ }
+  }
+  if (!actifs.length) {
+    box.innerHTML = `<p class="rech-empty">Aucun rechargeur disponible pour le moment.</p>`;
+    return;
+  }
+  box.innerHTML = actifs.map((r) => {
+    const message = encodeURIComponent("Bonjour, je veux acheter des stars MasterIA.");
+    return `<a class="rech-btn" href="https://wa.me/${r.whatsapp}?text=${message}" target="_blank" rel="noopener">
+      <span>${r.nom}</span><span class="go">WhatsApp →</span>
+    </a>`;
+  }).join("");
+}
+
+// ============================================================
+// ADMIN — codes, rechargeurs, statistiques
+// (section visible uniquement si users/{uid}.isAdmin === true ;
+// ce champ ne doit JAMAIS être modifiable depuis le site — il ne
+// doit être activé qu'à la main dans la console Firebase, sur ton
+// propre compte, pour que personne ne puisse se l'attribuer)
+// ============================================================
+function generateCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = "MIA-";
+  for (let i = 0; i < 10; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+}
+
+async function loadAdminStats() {
+  const statUsers = document.getElementById("statUsers");
+  const statCodesUnused = document.getElementById("statCodesUnused");
+  const statCodesUsed = document.getElementById("statCodesUsed");
+  statUsers.textContent = "…"; statCodesUnused.textContent = "…"; statCodesUsed.textContent = "…";
+  try { statUsers.textContent = (await getCountFromServer(collection(db, "users"))).data().count; }
+  catch (_) { statUsers.textContent = "?"; }
+  try { statCodesUnused.textContent = (await getCountFromServer(query(collection(db, "codes"), where("used", "==", false)))).data().count; }
+  catch (_) { statCodesUnused.textContent = "?"; }
+  try { statCodesUsed.textContent = (await getCountFromServer(query(collection(db, "codes"), where("used", "==", true)))).data().count; }
+  catch (_) { statCodesUsed.textContent = "?"; }
+  try { document.getElementById("statSupportNew").textContent = (await getCountFromServer(query(collection(db, "support"), where("status", "==", "nouveau")))).data().count; }
+  catch (_) { document.getElementById("statSupportNew").textContent = "?"; }
+}
+
+document.getElementById("genCodesBtn").addEventListener("click", async () => {
+  const genError = document.getElementById("genError");
+  const genSuccess = document.getElementById("genSuccess");
+  const genResultList = document.getElementById("genResultList");
+  genError.style.display = "none"; genSuccess.style.display = "none"; genResultList.innerHTML = "";
+
+  const stars = parseInt(document.getElementById("genStars").value, 10);
+  const qty = parseInt(document.getElementById("genQty").value, 10);
+  const note = document.getElementById("genNote").value.trim();
+
+  if (!stars || stars < 1) { genError.textContent = "Entre un nombre d'étoiles valide."; genError.style.display = "block"; return; }
+  if (!qty || qty < 1 || qty > 50) { genError.textContent = "Entre une quantité entre 1 et 50."; genError.style.display = "block"; return; }
+
+  const btn = document.getElementById("genCodesBtn");
+  btn.disabled = true; btn.textContent = "Génération…";
+  try {
+    const codes = [];
+    for (let i = 0; i < qty; i++) {
+      const code = generateCode();
+      await setDoc(doc(db, "codes", code), {
+        stars, used: false, note: note || null,
+        createdBy: auth.currentUser.uid, createdAt: serverTimestamp(),
+      });
+      codes.push(code);
+    }
+    genSuccess.textContent = `${qty} code(s) généré(s) — ${stars} étoiles chacun.`;
+    genSuccess.style.display = "block";
+    genResultList.innerHTML = `<div class="code-list">${codes.map((c) =>
+      `<div class="code-row"><span class="c-code">${c}</span><span class="c-stars">${stars}★</span></div>`
+    ).join("")}</div>`;
+    document.getElementById("genStars").value = "";
+    document.getElementById("genQty").value = "";
+    document.getElementById("genNote").value = "";
+    loadAdminStats();
+  } catch (e) {
+    genError.textContent = e.message || "Erreur lors de la génération.";
+    genError.style.display = "block";
+  } finally {
+    btn.disabled = false; btn.textContent = "Générer les codes";
+  }
+});
+
+document.getElementById("refreshCodesBtn").addEventListener("click", loadCodeList);
+async function loadCodeList() {
+  const codeList = document.getElementById("codeList");
+  codeList.innerHTML = `<p class="rech-empty" style="padding:12px;">Chargement…</p>`;
+  try {
+    const q = query(collection(db, "codes"), orderBy("createdAt", "desc"), limit(40));
+    const snap = await getDocs(q);
+    if (snap.empty) { codeList.innerHTML = `<p class="rech-empty" style="padding:12px;">Aucun code pour le moment.</p>`; return; }
+    codeList.innerHTML = snap.docs.map((d) => {
+      const c = d.data();
+      const statusTxt = c.used ? `<span class="c-used">utilisé</span>` : `<span class="c-used">disponible</span>`;
+      return `<div class="code-row">
+        <span class="c-code">${d.id}${c.note ? " · " + c.note : ""}</span>
+        <span class="c-stars">${c.stars}★</span>
+        ${statusTxt}
+        <button data-code="${d.id}" class="copyCodeBtn">Copier</button>
+      </div>`;
+    }).join("");
+    codeList.querySelectorAll(".copyCodeBtn").forEach((b) => {
+      b.addEventListener("click", () => {
+        navigator.clipboard.writeText(b.dataset.code);
+        b.textContent = "Copié !";
+        setTimeout(() => (b.textContent = "Copier"), 1200);
+      });
+    });
+  } catch (e) {
+    codeList.innerHTML = `<p class="rech-empty" style="padding:12px;">Erreur de chargement.</p>`;
+  }
+}
+
+// ------------------------------------------------------------
+// Messages support (lecture admin)
+// ------------------------------------------------------------
+document.getElementById("refreshSupportBtn").addEventListener("click", loadSupportList);
+async function loadSupportList() {
+  const list = document.getElementById("supportList");
+  list.innerHTML = `<p class="rech-empty">Chargement…</p>`;
+  try {
+    const q = query(collection(db, "support"), orderBy("createdAt", "desc"), limit(60));
+    const snap = await getDocs(q);
+    if (snap.empty) { list.innerHTML = `<p class="rech-empty">Aucun message pour le moment.</p>`; return; }
+    list.innerHTML = snap.docs.map((d) => {
+      const t = d.data();
+      const date = t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString("fr-FR") : "";
+      const badge = t.status === "traite" ? `<span class="status-badge traite">Traité</span>` : `<span class="status-badge nouveau">Nouveau</span>`;
+      return `<div class="ticket">
+        <div class="ticket-from">${escapeHtml(t.email || t.uid || "")} · ${date}</div>
+        <div class="ticket-top"><span class="ticket-subject">${escapeHtml(t.subject)}</span>${badge}</div>
+        <div class="ticket-msg">${escapeHtml(t.message)}</div>
+        <div class="ticket-actions">
+          <button data-id="${d.id}" data-next="${t.status === "traite" ? "nouveau" : "traite"}" class="toggleTicketBtn">
+            ${t.status === "traite" ? "Rouvrir" : "Marquer comme traité"}
+          </button>
+        </div>
+      </div>`;
+    }).join("");
+    list.querySelectorAll(".toggleTicketBtn").forEach((b) => {
+      b.addEventListener("click", async () => {
+        b.disabled = true; b.textContent = "…";
+        try {
+          await updateDoc(doc(db, "support", b.dataset.id), { status: b.dataset.next });
+          loadSupportList();
+          loadAdminStats();
+        } catch (e) {
+          b.disabled = false;
+        }
+      });
+    });
+  } catch (e) {
+    list.innerHTML = `<p class="rech-empty">Erreur de chargement.</p>`;
+  }
+}
+
+// ------------------------------------------------------------
+// Gestion des 5 rechargeurs
+// ------------------------------------------------------------
+async function loadRechAdminForm() {
+  const form = document.getElementById("rechAdminForm");
+  form.innerHTML = `<p class="rech-empty">Chargement…</p>`;
+  const rows = [];
+  for (const slot of RECHARGEUR_SLOTS) {
+    let data = { nom: "", whatsapp: "", actif: false };
+    try {
+      const snap = await getDoc(doc(db, "rechargeurs", slot));
+      if (snap.exists()) data = { ...data, ...snap.data() };
+    } catch (_) { /* rechargeur pas encore créé */ }
+    rows.push({ slot, ...data });
+  }
+  form.innerHTML = rows.map((r) => `
+    <div class="rech-admin-row" data-slot="${r.slot}">
+      <input type="text" class="rech-nom" placeholder="Nom (ex: Rechargeur 1)" value="${r.nom || ""}">
+      <input type="text" class="rech-whatsapp" placeholder="Numéro WhatsApp (ex: 22997000000)" value="${r.whatsapp || ""}">
+      <label><input type="checkbox" class="rech-actif" ${r.actif ? "checked" : ""}> Actif</label>
+    </div>
+  `).join("");
+}
+
+document.getElementById("saveRechBtn").addEventListener("click", async () => {
+  const rechAdminError = document.getElementById("rechAdminError");
+  const rechAdminSuccess = document.getElementById("rechAdminSuccess");
+  rechAdminError.style.display = "none"; rechAdminSuccess.style.display = "none";
+  const btn = document.getElementById("saveRechBtn");
+  btn.disabled = true; btn.textContent = "Enregistrement…";
+  try {
+    const rowEls = document.querySelectorAll("#rechAdminForm .rech-admin-row");
+    for (const rowEl of rowEls) {
+      const slot = rowEl.dataset.slot;
+      const nom = rowEl.querySelector(".rech-nom").value.trim();
+      const whatsapp = rowEl.querySelector(".rech-whatsapp").value.trim().replace(/[^0-9]/g, "");
+      const actif = rowEl.querySelector(".rech-actif").checked;
+      await setDoc(doc(db, "rechargeurs", slot), { nom, whatsapp, actif });
+    }
+    rechAdminSuccess.textContent = "Rechargeurs enregistrés.";
+    rechAdminSuccess.style.display = "block";
+    loadRechargeurs();
+  } catch (e) {
+    rechAdminError.textContent = e.message || "Erreur lors de l'enregistrement.";
+    rechAdminError.style.display = "block";
+  } finally {
+    btn.disabled = false; btn.textContent = "Enregistrer les rechargeurs";
+  }
+});
+
+// ------------------------------------------------------------
+// Recharge de stars via code
+// ------------------------------------------------------------
+document.getElementById("redeemBtn").addEventListener("click", async () => {
+  const redeemBtn = document.getElementById("redeemBtn");
+  const redeemError = document.getElementById("redeemError");
+  const redeemSuccess = document.getElementById("redeemSuccess");
+  redeemError.style.display = "none"; redeemSuccess.style.display = "none";
+  const code = document.getElementById("codeInput").value.trim().toUpperCase();
+  if (!code || !auth.currentUser) return;
+
+  redeemBtn.disabled = true; redeemBtn.textContent = "Vérification…";
+  try {
+    const codeRef = doc(db, "codes", code);
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    const starsAdded = await runTransaction(db, async (tx) => {
+      const codeSnap = await tx.get(codeRef);
+      if (!codeSnap.exists()) throw new Error("Ce code n'existe pas.");
+      const codeData = codeSnap.data();
+      if (codeData.used) throw new Error("Ce code a déjà été utilisé.");
+      const userSnap = await tx.get(userRef);
+      const userData = userSnap.data();
+      tx.update(codeRef, { used: true, usedBy: auth.currentUser.uid, usedAt: serverTimestamp() });
+      tx.update(userRef, {
+        stars: userData.stars + codeData.stars,
+        redeemedCode: code,
+      });
+      return codeData.stars;
+    });
+    redeemSuccess.textContent = `+${starsAdded} stars ajoutées !`;
+    redeemSuccess.style.display = "block";
+    document.getElementById("codeInput").value = "";
+  } catch (e) {
+    redeemError.textContent = e.message || "Code invalide.";
+    redeemError.style.display = "block";
+  } finally {
+    redeemBtn.disabled = false; redeemBtn.textContent = "Valider le code";
+  }
+});
+
+// ------------------------------------------------------------
+// Support — le client envoie un message, consultable dans l'admin.
+// ------------------------------------------------------------
+document.getElementById("supportSendBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("supportSendBtn");
+  const supportError = document.getElementById("supportError");
+  const supportSuccess = document.getElementById("supportSuccess");
+  supportError.style.display = "none"; supportSuccess.style.display = "none";
+  const subject = document.getElementById("supportSubject").value.trim();
+  const message = document.getElementById("supportMessage").value.trim();
+  if (!subject || !message) {
+    supportError.textContent = "Remplis le sujet et le message.";
+    supportError.style.display = "block";
+    return;
+  }
+  btn.disabled = true; btn.textContent = "Envoi…";
+  try {
+    await addDoc(collection(db, "support"), {
+      uid: auth.currentUser.uid,
+      email: auth.currentUser.email || "",
+      subject, message,
+      status: "nouveau",
+      createdAt: serverTimestamp(),
+    });
+    supportSuccess.textContent = "Message envoyé ! On te répond par email dès que possible.";
+    supportSuccess.style.display = "block";
+    document.getElementById("supportSubject").value = "";
+    document.getElementById("supportMessage").value = "";
+    loadMyTickets();
+  } catch (e) {
+    supportError.textContent = e.message || "Erreur lors de l'envoi.";
+    supportError.style.display = "block";
+  } finally {
+    btn.disabled = false; btn.textContent = "Envoyer le message";
+  }
+});
+
+async function loadMyTickets() {
+  const box = document.getElementById("myTickets");
+  if (!auth.currentUser) return;
+  try {
+    const q = query(collection(db, "support"), where("uid", "==", auth.currentUser.uid), orderBy("createdAt", "desc"), limit(10));
+    const snap = await getDocs(q);
+    if (snap.empty) { box.innerHTML = ""; return; }
+    box.innerHTML = `<p class="ticket-meta" style="margin-bottom:8px;">TES DERNIERS MESSAGES</p>` + snap.docs.map((d) => {
+      const t = d.data();
+      const badge = t.status === "traite" ? `<span class="status-badge traite">Traité</span>` : `<span class="status-badge nouveau">En attente</span>`;
+      return `<div class="ticket">
+        <div class="ticket-top"><span class="ticket-subject">${escapeHtml(t.subject)}</span>${badge}</div>
+        <div class="ticket-msg">${escapeHtml(t.message)}</div>
+      </div>`;
+    }).join("");
+  } catch (e) {
+    // Si l'index composite Firestore n'existe pas encore, la console
+    // du navigateur affichera un lien pour le créer en un clic.
+    box.innerHTML = "";
+  }
+}
+
+function escapeHtml(s) {
+  const div = document.createElement("div");
+  div.textContent = s || "";
+  return div.innerHTML;
+}
+
+async function debitForService(kind) {
+  const COSTS = { mastering: MASTERING_COST_STARS, production: PRODUCTION_COST_STARS, instrumental: INSTRUGEN_COST_STARS };
+  const cost = COSTS[kind];
+  const userRef = doc(db, "users", auth.currentUser.uid);
+  return runTransaction(db, async (tx) => {
+    const snap = await tx.get(userRef);
+    const d = snap.data();
+    if (d.stars >= cost) { tx.update(userRef, { stars: d.stars - cost }); return "stars"; }
+    const err = new Error(`Il te faut ${cost} stars pour continuer (il t'en manque ${cost - d.stars}).`);
+    err.code = "paywall";
+    throw err;
+  });
+}
+
+// ============================================================
+// MOTEUR DE MASTERING — Web Audio API, 100% local, 100% gratuit.
+// Chaîne : passe-haut (rumble) → EQ 3 bandes → compresseur →
+// limiteur (protection anti-écrêtage) → normalisation du niveau.
+// ============================================================
+async function decodeFile(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const buffer = await ctx.decodeAudioData(arrayBuffer);
+  ctx.close();
+  return buffer;
+}
+
+async function runMasteringChain(inputBuffer, presetName = "standard") {
+  const preset = MASTER_PRESETS[presetName] || MASTER_PRESETS.standard;
+  const offline = new OfflineAudioContext(
+    inputBuffer.numberOfChannels, inputBuffer.length, inputBuffer.sampleRate
+  );
+
+  const source = offline.createBufferSource();
+  source.buffer = inputBuffer;
+
+  // 1) Passe-haut : retire le rumble sous 30 Hz
+  const highpass = offline.createBiquadFilter();
+  highpass.type = "highpass"; highpass.frequency.value = 30; highpass.Q.value = 0.7;
+  source.connect(highpass);
+
+  // 2) Compression MULTIBANDE : le signal est séparé en 3 bandes
+  // (graves / médiums / aigus), chacune compressée indépendamment
+  // avec des réglages adaptés — c'est la technique utilisée en
+  // vrai mastering studio, bien plus efficace qu'un compresseur
+  // unique sur tout le signal (qui "pompe" tout dès qu'un seul
+  // registre dépasse).
+  const LOW_X = 250, HIGH_X = 4000;
+
+  const lowFilter = offline.createBiquadFilter();
+  lowFilter.type = "lowpass"; lowFilter.frequency.value = LOW_X; lowFilter.Q.value = 0.707;
+
+  const midHP = offline.createBiquadFilter();
+  midHP.type = "highpass"; midHP.frequency.value = LOW_X; midHP.Q.value = 0.707;
+  const midLP = offline.createBiquadFilter();
+  midLP.type = "lowpass"; midLP.frequency.value = HIGH_X; midLP.Q.value = 0.707;
+
+  const highFilter = offline.createBiquadFilter();
+  highFilter.type = "highpass"; highFilter.frequency.value = HIGH_X; highFilter.Q.value = 0.707;
+
+  highpass.connect(lowFilter);
+  highpass.connect(midHP); midHP.connect(midLP);
+  highpass.connect(highFilter);
+
+  // Les seuils/ratios sont modulés par le preset choisi par
+  // l'utilisateur (Doux / Standard / Club) pour offrir un vrai
+  // choix de style de mastering plutôt qu'un réglage figé.
+  const compLow = offline.createDynamicsCompressor();
+  compLow.threshold.value = -24 + preset.thresholdOffset; compLow.knee.value = 6; compLow.ratio.value = 4 * preset.ratioMul;
+  compLow.attack.value = 0.02; compLow.release.value = 0.25;
+
+  const compMid = offline.createDynamicsCompressor();
+  compMid.threshold.value = -20 + preset.thresholdOffset; compMid.knee.value = 8; compMid.ratio.value = 2.5 * preset.ratioMul;
+  compMid.attack.value = 0.008; compMid.release.value = 0.2;
+
+  const compHigh = offline.createDynamicsCompressor();
+  compHigh.threshold.value = -22 + preset.thresholdOffset; compHigh.knee.value = 6; compHigh.ratio.value = 3 * preset.ratioMul;
+  compHigh.attack.value = 0.003; compHigh.release.value = 0.15;
+
+  lowFilter.connect(compLow);
+  midLP.connect(compMid);
+  highFilter.connect(compHigh);
+
+  const gainLow = offline.createGain(); gainLow.gain.value = 1.15;
+  const gainMid = offline.createGain(); gainMid.gain.value = 1.0;
+  const gainHigh = offline.createGain(); gainHigh.gain.value = 1.05;
+  compLow.connect(gainLow);
+  compMid.connect(gainMid);
+  compHigh.connect(gainHigh);
+
+  // Recombinaison des 3 bandes
+  const bus = offline.createGain(); bus.gain.value = 1.0;
+  gainLow.connect(bus); gainMid.connect(bus); gainHigh.connect(bus);
+
+  // 2.5) Élargissement stéréo léger (matrice mid/side) : élargit
+  // l'image stéréo sans toucher au centre (voix, basse), pour un
+  // rendu plus "large" façon mastering studio. S'applique seulement
+  // aux fichiers déjà en stéréo.
+  let widenedBus = bus;
+  if (inputBuffer.numberOfChannels === 2) {
+    const splitter = offline.createChannelSplitter(2);
+    bus.connect(splitter);
+    const width = preset.widthMul;
+    const l2mid = offline.createGain(); l2mid.gain.value = 0.5;
+    const r2mid = offline.createGain(); r2mid.gain.value = 0.5;
+    const l2side = offline.createGain(); l2side.gain.value = 0.5 * width;
+    const r2side = offline.createGain(); r2side.gain.value = -0.5 * width;
+    const mid = offline.createGain(); mid.gain.value = 1;
+    const side = offline.createGain(); side.gain.value = 1;
+    splitter.connect(l2mid, 0); splitter.connect(r2mid, 1);
+    l2mid.connect(mid); r2mid.connect(mid);
+    splitter.connect(l2side, 0); splitter.connect(r2side, 1);
+    l2side.connect(side); r2side.connect(side);
+    const sideInv = offline.createGain(); sideInv.gain.value = -1;
+    side.connect(sideInv);
+    const outL = offline.createGain(); const outR = offline.createGain();
+    mid.connect(outL); side.connect(outL);
+    mid.connect(outR); sideInv.connect(outR);
+    const merger = offline.createChannelMerger(2);
+    outL.connect(merger, 0, 0); outR.connect(merger, 0, 1);
+    widenedBus = merger;
+  }
+
+  // 3) Touches de tonalité globale après recombinaison
+  const presence = offline.createBiquadFilter();
+  presence.type = "peaking"; presence.frequency.value = 3000; presence.Q.value = 1; presence.gain.value = 1.5;
+  const air = offline.createBiquadFilter();
+  air.type = "highshelf"; air.frequency.value = 11000; air.gain.value = 1.5;
+  widenedBus.connect(presence); presence.connect(air);
+
+  // 4) Gain de compensation (la compression réduit le niveau moyen)
+  const makeup = offline.createGain();
+  makeup.gain.value = 1.5 * preset.makeupMul;
+  air.connect(makeup);
+
+  // 5) Limiteur final : ratio très élevé + attaque quasi instantanée,
+  // agit comme un plafond dur pour empêcher tout écrêtage.
+  const limiter = offline.createDynamicsCompressor();
+  limiter.threshold.value = preset.limiterThreshold; limiter.knee.value = 0;
+  limiter.ratio.value = 20; limiter.attack.value = 0.001; limiter.release.value = 0.05;
+  makeup.connect(limiter);
+  limiter.connect(offline.destination);
+
+  source.start(0);
+  return offline.startRendering();
+}
+
+// Normalisation finale : mesure le pic et la RMS du rendu, puis
+// applique un gain pour viser un niveau cible, avec sécurité anti-écrêtage.
+function normalizeBuffer(buffer, targetPeakDb = -1, targetRmsDb = -14) {
+  let peak = 0, sumSquares = 0, sampleCount = 0;
+  for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+    const data = buffer.getChannelData(ch);
+    for (let i = 0; i < data.length; i++) {
+      const v = Math.abs(data[i]);
+      if (v > peak) peak = v;
+      sumSquares += data[i] * data[i];
+      sampleCount++;
+    }
+  }
+  const rms = Math.sqrt(sumSquares / Math.max(1, sampleCount));
+  const rmsDb = 20 * Math.log10(rms || 1e-8);
+  const peakDb = 20 * Math.log10(peak || 1e-8);
+
+  const gainForRms = Math.pow(10, (targetRmsDb - rmsDb) / 20);
+  const maxGainBeforeClip = Math.pow(10, (targetPeakDb - peakDb) / 20);
+  const finalGain = Math.min(gainForRms, maxGainBeforeClip);
+
+  for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+    const data = buffer.getChannelData(ch);
+    for (let i = 0; i < data.length; i++) data[i] = Math.max(-1, Math.min(1, data[i] * finalGain));
+  }
+  return buffer;
+}
+
+async function masterAudioBuffer(inputBuffer, presetName = "standard") {
+  const preset = MASTER_PRESETS[presetName] || MASTER_PRESETS.standard;
+  const processed = await runMasteringChain(inputBuffer, presetName);
+  return normalizeBuffer(processed, preset.targetPeakDb, preset.targetRmsDb);
+}
+
+// ============================================================
+// GÉNÉRATEUR D'INSTRUMENTAL AUTOMATIQUE — 100% local, 100% synthèse.
+//
+// Honnêteté : ceci détecte la tonalité et le tempo dominants d'une
+// voix seule (autocorrélation + comparaison à des profils de gammes
+// standards), puis synthétise par oscillateurs (batterie, basse,
+// accords) un accompagnement fonctionnel dans ce ton et ce tempo.
+// Ce n'est PAS une composition sur-mesure façon beatmaker : c'est un
+// accompagnement généré automatiquement, cohérent musicalement,
+// gratuit et instantané.
+// ============================================================
+
+const NOTE_NAMES = ["Do", "Do#", "Ré", "Ré#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"];
+
+function monoMixdown(buffer) {
+  const len = buffer.length;
+  const out = new Float32Array(len);
+  for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+    const data = buffer.getChannelData(ch);
+    for (let i = 0; i < len; i++) out[i] += data[i] / buffer.numberOfChannels;
+  }
+  return out;
+}
+
+// Détection de tempo : enveloppe d'énergie → flux d'attaque → auto-
+// corrélation dans la plage 60-180 BPM.
+function detectTempo(mono, sampleRate) {
+  const hop = Math.round(sampleRate * 0.02); // 20 ms
+  const nHops = Math.floor(mono.length / hop);
+  const energy = new Float32Array(nHops);
+  for (let i = 0; i < nHops; i++) {
+    let sum = 0;
+    for (let j = 0; j < hop; j++) { const s = mono[i * hop + j] || 0; sum += s * s; }
+    energy[i] = Math.sqrt(sum / hop);
+  }
+  const flux = new Float32Array(nHops);
+  for (let i = 1; i < nHops; i++) flux[i] = Math.max(0, energy[i] - energy[i - 1]);
+
+  const hopDuration = hop / sampleRate;
+  const minLag = Math.round(60 / 180 / hopDuration); // 180 BPM
+  const maxLag = Math.round(60 / 60 / hopDuration);  // 60 BPM
+  let bestLag = minLag, bestScore = -Infinity;
+  for (let lag = minLag; lag <= maxLag; lag++) {
+    let score = 0;
+    for (let i = 0; i + lag < nHops; i++) score += flux[i] * flux[i + lag];
+    if (score > bestScore) { bestScore = score; bestLag = lag; }
+  }
+  let bpm = 60 / (bestLag * hopDuration);
+  while (bpm < 80) bpm *= 2;   // ramène dans une plage musicale usuelle
+  while (bpm > 160) bpm /= 2;
+
+  // ------------------------------------------------------------
+  // PHASE : à quel instant tombe réellement le premier "temps fort"
+  // de la voix — sans ça, l'instrumental démarre pile à 0s et finit
+  // décalé (en retard ou en avance) par rapport au chant dès qu'il y
+  // a un silence d'intro ou une entrée à contretemps.
+  // On teste tous les décalages possibles sur une période de battement
+  // et on garde celui qui tombe le plus souvent sur une vraie attaque.
+  // ------------------------------------------------------------
+  let bestPhaseHop = 0, bestPhaseScore = -Infinity;
+  for (let phase = 0; phase < bestLag; phase++) {
+    let score = 0;
+    for (let i = phase; i < nHops; i += bestLag) score += flux[i];
+    if (score > bestPhaseScore) { bestPhaseScore = score; bestPhaseHop = phase; }
+  }
+  const phase = bestPhaseHop * hopDuration; // en secondes
+
+  return { bpm: Math.round(bpm), phase };
+}
+
+// Détection de tonalité : pitch par autocorrélation sur chaque trame
+// voisée, histogramme des classes de hauteur, comparaison aux profils
+// de Krumhansl-Kessler (méthode standard de détection de tonalité).
+const KK_MAJOR = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88];
+const KK_MINOR = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17];
+
+function detectKey(mono, sampleRate) {
+  const frameSize = 2048, hop = 1024;
+  const chroma = new Float32Array(12);
+  const minLag = Math.round(sampleRate / 800); // 800 Hz
+  const maxLag = Math.round(sampleRate / 80);  // 80 Hz
+
+  for (let start = 0; start + frameSize < mono.length; start += hop) {
+    let rms = 0;
+    for (let i = 0; i < frameSize; i++) rms += mono[start + i] * mono[start + i];
+    rms = Math.sqrt(rms / frameSize);
+    if (rms < 0.01) continue; // silence, on ignore
+
+    let bestLag = -1, bestCorr = 0, zeroCorr = 0;
+    for (let i = 0; i < frameSize - maxLag; i++) zeroCorr += mono[start + i] * mono[start + i];
+    for (let lag = minLag; lag <= maxLag; lag++) {
+      let corr = 0;
+      for (let i = 0; i < frameSize - maxLag; i++) corr += mono[start + i] * mono[start + i + lag];
+      if (corr > bestCorr) { bestCorr = corr; bestLag = lag; }
+    }
+    const normalized = zeroCorr > 0 ? bestCorr / zeroCorr : 0;
+    if (bestLag > 0 && normalized > 0.35) { // trame suffisamment voisée
+      const freq = sampleRate / bestLag;
+      const midi = 69 + 12 * Math.log2(freq / 440);
+      const pitchClass = ((Math.round(midi) % 12) + 12) % 12;
+      chroma[pitchClass] += rms;
+    }
+  }
+
+  let best = { root: 0, mode: "major", score: -Infinity };
+  for (let root = 0; root < 12; root++) {
+    let scoreMaj = 0, scoreMin = 0;
+    for (let i = 0; i < 12; i++) {
+      scoreMaj += chroma[i] * KK_MAJOR[(i - root + 12) % 12];
+      scoreMin += chroma[i] * KK_MINOR[(i - root + 12) % 12];
+    }
+    if (scoreMaj > best.score) best = { root, mode: "major", score: scoreMaj };
+    if (scoreMin > best.score) best = { root, mode: "minor", score: scoreMin };
+  }
+  return { root: best.root, mode: best.mode, name: `${NOTE_NAMES[best.root]} ${best.mode === "major" ? "majeur" : "mineur"}` };
+}
+
+function midiToFreq(midi) { return 440 * Math.pow(2, (midi - 69) / 12); }
+
+// ============================================================
+// PROFILS DE STYLE — 10 styles, chacun avec son propre motif
+// rythmique (grille de 16 temps par mesure), son tempo type et
+// ses instruments spécifiques. C'est ce qui remplace l'ancien
+// moteur "un seul motif pour tout le monde".
+// ------------------------------------------------------------
+// steps = indices 0-15 dans la mesure (16 doubles-croches)
+// ============================================================
+const STYLE_PROFILES = {
+  rap: {
+    label: "Rap", bpmRange: [70, 100], swing: 0.08,
+    kick: [0, 10], snare: [4, 12],
+    hatClosed: [0, 2, 4, 6, 8, 10, 12, 14], hatOpen: [15],
+    bass: { style: "pluck", steps: [0, 7, 8] },
+    chord: { style: "stab", steps: [0, 8] },
+    extra: [{ type: "shaker", steps: "all", gain: 0.06 }],
+  },
+  rnb: {
+    label: "RnB", bpmRange: [60, 90], swing: 0.15,
+    kick: [0, 10], snare: [4, 12],
+    hatClosed: [0, 3, 6, 8, 11, 14],
+    bass: { style: "sustained", steps: [0] },
+    chord: { style: "pad", steps: [0] },
+    extra: [{ type: "pluck", steps: [2, 6, 10, 14], gain: 0.16 }],
+  },
+  pop: {
+    label: "Pop", bpmRange: [95, 128], swing: 0,
+    kick: [0, 8], snare: [4, 12],
+    hatClosed: [0, 2, 4, 6, 8, 10, 12, 14],
+    bass: { style: "pluck", steps: [0, 4, 8, 12] },
+    chord: { style: "stab", steps: [0, 8] },
+    extra: [{ type: "clap", steps: [4, 12], gain: 0.3 }],
+  },
+  afrobeat: {
+    label: "Afrobeat", bpmRange: [95, 115], swing: 0.12,
+    kick: [0, 6, 10], snare: [4, 12],
+    hatClosed: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], hatOpen: [14],
+    bass: { style: "pluck", steps: [0, 3, 7, 10, 13] },
+    chord: { style: "stab", steps: [0, 6, 10] },
+    extra: [
+      { type: "logdrum", steps: [0, 3, 7, 10, 13], gain: 0.28 },
+      { type: "shaker", steps: "all", gain: 0.05 },
+    ],
+  },
+  melo: {
+    label: "Mélo", bpmRange: [60, 75], swing: 0,
+    kick: [0], snare: [8],
+    hatClosed: [4, 12],
+    bass: { style: "sustained", steps: [0] },
+    chord: { style: "pad", steps: [0] },
+    extra: [{ type: "pluck", steps: [0, 4, 8, 12], gain: 0.12, soft: true }],
+  },
+  coupe_decale: {
+    label: "Coupé-décalé", bpmRange: [130, 145], swing: 0,
+    kick: [0, 4, 8, 12], snare: [4, 6, 12, 14],
+    hatClosed: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+    bass: { style: "pluck", steps: [0, 4, 8, 12] },
+    chord: { style: "stab", steps: [0, 4, 8, 12] },
+    extra: [
+      { type: "logdrum", steps: [2, 6, 10, 14], gain: 0.22 },
+      { type: "shaker", steps: "all", gain: 0.07 },
+    ],
+  },
+  afrotrap: {
+    label: "Afro-trap", bpmRange: [130, 150], swing: 0.05,
+    kick: [0, 10], snare: [4, 12],
+    hatClosed: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+    bass: { style: "sub", steps: [0, 10] },
+    chord: { style: "stab", steps: [0] },
+    extra: [
+      { type: "logdrum", steps: [3, 7, 13], gain: 0.2 },
+      { type: "shaker", steps: "all", gain: 0.05 },
+    ],
+  },
+  gospel: {
+    label: "Gospel", bpmRange: [70, 100], swing: 0.1,
+    kick: [0, 10], snare: [4, 12],
+    hatClosed: [0, 2, 4, 6, 8, 10, 12, 14],
+    bass: { style: "pluck", steps: [0, 4, 8, 12] },
+    chord: { style: "pad", steps: [0] },
+    extra: [
+      { type: "shaker", steps: "all", gain: 0.08 },
+      { type: "pad2", steps: [0], gain: 0.08 },
+    ],
+  },
+  dancehall: {
+    label: "Dancehall", bpmRange: [90, 110], swing: 0.05,
+    kick: [0, 7, 10], snare: [4, 12],
+    hatClosed: [0, 2, 4, 6, 8, 10, 12, 14],
+    bass: { style: "pluck", steps: [0, 7, 10] },
+    chord: { style: "skank", steps: [2, 6, 10, 14] },
+    extra: [{ type: "shaker", steps: "all", gain: 0.06 }],
+  },
+  amapiano: {
+    label: "Amapiano", bpmRange: [110, 115], swing: 0.05,
+    kick: [0, 10], snare: [4, 12],
+    hatClosed: [0, 4, 8, 12],
+    bass: { style: "sustained", steps: [0] },
+    chord: { style: "pad", steps: [0] },
+    extra: [
+      { type: "logdrum", steps: [0, 3, 6, 8, 11, 14], gain: 0.34 },
+      { type: "shaker", steps: "all", gain: 0.05 },
+    ],
+  },
+};
+
+// Ramène le tempo détecté (qui peut se tromper d'octave — trop
+// rapide ou trop lent par rapport à la vraie pulsation) dans la
+// plage typique du style choisi. C'est ce qui corrige le
+// "rythme trop rapide par rapport à la chanson".
+function snapBpmToStyle(bpm, bpmRange) {
+  const [lo, hi] = bpmRange;
+  const mid = (lo + hi) / 2;
+  let candidates = [bpm, bpm * 2, bpm / 2, bpm * 4, bpm / 4].filter((b) => b >= 40 && b <= 220);
+  candidates.sort((a, b) => Math.abs(a - mid) - Math.abs(b - mid));
+  let best = candidates[0];
+  return Math.max(lo, Math.min(hi, Math.round(best)));
+}
+
+// Synthétise une composition complète (batterie, basse, accords,
+// instruments spécifiques au style) dans le ton/tempo détectés,
+// sur toute la durée de la voix fournie.
+async function generateInstrumental(vocalBuffer, key, detectedBpm, genreKey, detectedPhase) {
+  const profile = STYLE_PROFILES[genreKey] || STYLE_PROFILES.pop;
+  const bpm = snapBpmToStyle(detectedBpm, profile.bpmRange);
+
+  const sampleRate = vocalBuffer.sampleRate;
+  const duration = vocalBuffer.duration;
+  const offline = new OfflineAudioContext(2, Math.ceil(duration * sampleRate), sampleRate);
+
+  const beat = 60 / bpm;
+  const step = beat / 4; // durée d'une double-croche
+  const bar = beat * 4;
+
+  // Recale la phase détectée (calculée sur le tempo brut) sur UN
+  // battement du tempo final retenu — c'est ce qui aligne réellement
+  // la grille rythmique sur les attaques de la voix.
+  const phaseOffset = ((detectedPhase || 0) % beat + beat) % beat;
+  const numBars = Math.ceil((duration - phaseOffset) / bar) + 1;
+
+  // Progression d'accords (degrés de gamme, en demi-tons depuis la tonique)
+  const progression = key.mode === "major"
+    ? [{ offset: 0, quality: "maj" }, { offset: 7, quality: "maj" }, { offset: 9, quality: "min" }, { offset: 5, quality: "maj" }]
+    : [{ offset: 0, quality: "min" }, { offset: 8, quality: "maj" }, { offset: 3, quality: "maj" }, { offset: 10, quality: "maj" }];
+
+  const master = offline.createGain();
+  master.gain.value = 0.85;
+  master.connect(offline.destination);
+
+  // Décalage "swing" appliqué aux doubles-croches impaires (feel groove)
+  function stepTime(barStart, stepIndex) {
+    const swingOffset = (stepIndex % 2 === 1) ? profile.swing * step : 0;
+    return barStart + stepIndex * step + swingOffset;
+  }
+
+  function playTone(freq, startTime, dur, type, peakGain, attack, release) {
+    const osc = offline.createOscillator();
+    const gain = offline.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(peakGain, startTime + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + dur + release);
+    osc.connect(gain); gain.connect(master);
+    osc.start(startTime); osc.stop(startTime + dur + release + 0.02);
+  }
+
+  // Percussion à hauteur descendante — sert au kick ET au log-drum
+  // (paramètres différents = timbre différent)
+  function playPercTone(startTime, f0, f1, decay, gain, type) {
+    const osc = offline.createOscillator();
+    const g = offline.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(f0, startTime);
+    osc.frequency.exponentialRampToValueAtTime(f1, startTime + decay * 0.55);
+    g.gain.setValueAtTime(gain, startTime);
+    g.gain.exponentialRampToValueAtTime(0.001, startTime + decay);
+    osc.connect(g); g.connect(master);
+    osc.start(startTime); osc.stop(startTime + decay + 0.03);
+  }
+
+  function playKick(startTime) { playPercTone(startTime, 150, 40, 0.22, 0.9, "sine"); }
+  function playLogDrum(startTime, gain) { playPercTone(startTime, 210, 95, 0.16, gain || 0.3, "sine"); }
+
+  function noiseBurst(startTime, dur, filterType, filterFreq, peakGain, Q) {
+    const bufferSize = Math.round(sampleRate * dur);
+    const noiseBuf = offline.createBuffer(1, bufferSize, sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const src = offline.createBufferSource(); src.buffer = noiseBuf;
+    const filter = offline.createBiquadFilter();
+    filter.type = filterType; filter.frequency.value = filterFreq;
+    if (Q) filter.Q.value = Q;
+    const gain = offline.createGain();
+    gain.gain.setValueAtTime(peakGain, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + dur);
+    src.connect(filter); filter.connect(gain); gain.connect(master);
+    src.start(startTime);
+  }
+
+  function playSnare(startTime) {
+    noiseBurst(startTime, 0.15, "bandpass", 2000, 0.5, 1);
+    playPercTone(startTime, 180, 120, 0.08, 0.15, "triangle");
+  }
+  function playClap(startTime, gain) {
+    [0, 0.012, 0.024].forEach((d) => noiseBurst(startTime + d, 0.09, "bandpass", 1700, gain || 0.28, 2));
+  }
+  function playHat(startTime, open) { noiseBurst(startTime, open ? 0.22 : 0.05, "highpass", 8000, open ? 0.14 : 0.18); }
+  function playShaker(startTime, gain) { noiseBurst(startTime, 0.04, "highpass", 9000, gain || 0.06, 3); }
+  function playPluck(startTime, freq, gain, soft) {
+    playTone(freq, startTime, soft ? beat * 0.5 : beat * 0.28, soft ? "triangle" : "square", gain, 0.005, 0.06);
+  }
+  function playSkank(startTime, freq, gain) {
+    playTone(freq, startTime, step * 0.7, "square", gain, 0.002, 0.03);
+  }
+
+  for (let b = 0; b < numBars; b++) {
+    const chord = progression[b % 4];
+    const barStart = phaseOffset + b * bar;
+    if (barStart >= duration) break;
+    const rootMidi = 48 + key.root + chord.offset; // basse ~ octave 3
+    const third = chord.quality === "maj" ? 4 : 3;
+    const rootFreq = midiToFreq(rootMidi);
+
+    // ---- Batterie ----
+    profile.kick.forEach((s) => playKick(stepTime(barStart, s)));
+    profile.snare.forEach((s) => playSnare(stepTime(barStart, s)));
+    (profile.hatClosed || []).forEach((s) => playHat(stepTime(barStart, s), false));
+    (profile.hatOpen || []).forEach((s) => playHat(stepTime(barStart, s), true));
+
+    // ---- Basse ----
+    const bassDur = profile.bass.style === "sustained" ? bar * 0.95
+      : profile.bass.style === "sub" ? beat * 1.8 : beat * 0.9;
+    const bassType = profile.bass.style === "sub" ? "sine" : "sawtooth";
+    const bassGain = profile.bass.style === "sub" ? 0.4 : 0.35;
+    if (profile.bass.style === "sustained") {
+      playTone(rootFreq / 2, barStart, bassDur, "sine", bassGain, 0.02, 0.08);
+    } else {
+      const bassFreq = profile.bass.style === "sub" ? rootFreq / 2 : rootFreq;
+      profile.bass.steps.forEach((s) => playTone(bassFreq, stepTime(barStart, s), bassDur, bassType, bassGain, 0.008, 0.05));
+    }
+
+    // ---- Accords ----
+    if (profile.chord.style === "pad") {
+      [0, third, 7].forEach((iv) => playTone(midiToFreq(rootMidi + 12 + iv), barStart, bar * 0.95, "triangle", 0.12, 0.08, 0.3));
+    } else if (profile.chord.style === "stab") {
+      profile.chord.steps.forEach((s) => {
+        [0, third, 7].forEach((iv) => playTone(midiToFreq(rootMidi + 12 + iv), stepTime(barStart, s), beat * 0.55, "triangle", 0.16, 0.005, 0.08));
+      });
+    } else if (profile.chord.style === "skank") {
+      profile.chord.steps.forEach((s) => {
+        [third, 7].forEach((iv) => playSkank(stepTime(barStart, s), midiToFreq(rootMidi + 12 + iv), 0.14));
+      });
+    }
+
+    // ---- Instruments spécifiques au style ----
+    (profile.extra || []).forEach((ex) => {
+      if (ex.type === "shaker") {
+        const steps = ex.steps === "all" ? [...Array(16).keys()] : ex.steps;
+        steps.forEach((s) => playShaker(stepTime(barStart, s), ex.gain));
+      } else if (ex.type === "clap") {
+        ex.steps.forEach((s) => playClap(stepTime(barStart, s), ex.gain));
+      } else if (ex.type === "logdrum") {
+        ex.steps.forEach((s) => playLogDrum(stepTime(barStart, s), ex.gain));
+      } else if (ex.type === "pluck") {
+        ex.steps.forEach((s, idx) => {
+          const iv = [0, third, 7, 12][idx % 4];
+          playPluck(stepTime(barStart, s), midiToFreq(rootMidi + 12 + iv), ex.gain, ex.soft);
+        });
+      } else if (ex.type === "pad2") {
+        playTone(midiToFreq(rootMidi + 24), barStart, bar * 0.9, "sine", ex.gain, 0.15, 0.3);
+      }
+    });
+  }
+
+  const rendered = await offline.startRendering();
+  return { buffer: rendered, actualBpm: bpm, styleLabel: profile.label };
+}
+
+// Mixe deux AudioBuffer (instrumental + voix) en un seul, avant mastering.
+// Mixe deux AudioBuffer (instrumental + voix) en un seul, avant
+// mastering. Normalise chaque piste séparément avant de les
+// combiner (évite qu'une piste enregistrée plus fort n'écrase
+// l'autre), puis creuse légèrement l'instrumental dans la zone de
+// présence de la voix (comme un ingé du son "fait de la place"
+// pour le chant) avant de sommer les deux.
+async function mixBuffers(instru, voix, offlineSampleRate) {
+  function peakOf(buffer) {
+    let peak = 0;
+    for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+      const data = buffer.getChannelData(ch);
+      for (let i = 0; i < data.length; i++) peak = Math.max(peak, Math.abs(data[i]));
+    }
+    return peak || 1;
+  }
+
+  const instruPeak = peakOf(instru);
+  const voixPeak = peakOf(voix);
+  const instruNormGain = 0.8 / instruPeak;   // ramène l'instru à -~2dB de crête
+  const voixNormGain = 0.9 / voixPeak;       // la voix reste légèrement devant
+
+  const length = Math.max(instru.length, voix.length);
+  const channels = Math.max(instru.numberOfChannels, voix.numberOfChannels);
+  const ctx = new OfflineAudioContext(channels, length, offlineSampleRate);
+
+  const instruSrc = ctx.createBufferSource(); instruSrc.buffer = instru;
+  const voixSrc = ctx.createBufferSource(); voixSrc.buffer = voix;
+
+  // Creux de présence : on retire un peu de place à l'instru là où
+  // la voix vit le plus (1.5-4 kHz), pour qu'elle ressorte sans
+  // avoir besoin de monter le volume du chant.
+  const pocketFilter = ctx.createBiquadFilter();
+  pocketFilter.type = "peaking"; pocketFilter.frequency.value = 2500; pocketFilter.Q.value = 1; pocketFilter.gain.value = -3.5;
+
+  const instruGain = ctx.createGain(); instruGain.gain.value = instruNormGain * 0.85;
+  const voixGain = ctx.createGain(); voixGain.gain.value = voixNormGain;
+
+  instruSrc.connect(pocketFilter); pocketFilter.connect(instruGain); instruGain.connect(ctx.destination);
+  voixSrc.connect(voixGain); voixGain.connect(ctx.destination);
+
+  instruSrc.start(0); voixSrc.start(0);
+  return ctx.startRendering();
+}
+
+// Encode un AudioBuffer en fichier WAV (PCM 16 bits) — aucune librairie requise.
+function audioBufferToWav(buffer) {
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const numFrames = buffer.length;
+  const bytesPerSample = 2;
+  const blockAlign = numChannels * bytesPerSample;
+  const dataSize = numFrames * blockAlign;
+  const bufferArray = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(bufferArray);
+
+  function writeString(offset, str) { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); }
+
+  writeString(0, "RIFF"); view.setUint32(4, 36 + dataSize, true); writeString(8, "WAVE");
+  writeString(12, "fmt "); view.setUint32(16, 16, true); view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true); view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true); view.setUint16(32, blockAlign, true);
+  view.setUint16(34, 16, true); writeString(36, "data"); view.setUint32(40, dataSize, true);
+
+  const channelData = [];
+  for (let ch = 0; ch < numChannels; ch++) channelData.push(buffer.getChannelData(ch));
+
+  let offset = 44;
+  for (let i = 0; i < numFrames; i++) {
+    for (let ch = 0; ch < numChannels; ch++) {
+      const s = Math.max(-1, Math.min(1, channelData[ch][i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+      offset += 2;
+    }
+  }
+  return new Blob([bufferArray], { type: "audio/wav" });
+}
+
+// ------------------------------------------------------------
+// Mastering classique
+// ------------------------------------------------------------
+const uploadBoxMaster = document.getElementById("uploadBoxMaster");
+const fileInputMaster = document.getElementById("fileInputMaster");
+const masterFileChip = document.getElementById("masterFileChip");
+const masterWavePreview = document.getElementById("masterWavePreview");
+let masteringInProgress = false;
+uploadBoxMaster.addEventListener("click", () => { if (!masteringInProgress) fileInputMaster.click(); });
+fileInputMaster.addEventListener("change", (e) => { if (e.target.files.length) handleMastering(e.target.files[0]); e.target.value = ""; });
+wireDropZone(uploadBoxMaster, fileInputMaster, (file, err) => {
+  const masterError = document.getElementById("masterError");
+  if (err) { masterError.textContent = err; masterError.style.display = "block"; return; }
+  if (!masteringInProgress) handleMastering(file);
+});
+
+async function handleMastering(file) {
+  const progressTrack = document.getElementById("progressTrackMaster");
+  const progressBar = document.getElementById("progressBarMaster");
+  const progressLabel = document.getElementById("progressLabelMaster");
+  const masterError = document.getElementById("masterError");
+  const masterResult = document.getElementById("masterResult");
+  masterError.style.display = "none"; masterResult.style.display = "none";
+
+  if (masteringInProgress) return;
+  if (file.size > MAX_FILE_SIZE) {
+    masterError.textContent = "Fichier trop volumineux (60 Mo max).";
+    masterError.style.display = "block";
+    return;
+  }
+  masteringInProgress = true;
+  uploadBoxMaster.style.opacity = "0.5";
+  masterFileChip.textContent = `${file.name} · ${formatBytes(file.size)}`;
+  masterFileChip.classList.add("show");
+  progressTrack.style.display = "block"; progressLabel.style.display = "block";
+
+  try {
+    // On décode et valide le fichier AVANT de débiter les stars, pour
+    // ne jamais faire payer un client pour un fichier corrompu ou
+    // dans un format non supporté par le navigateur.
+    progressBar.style.width = "15%"; progressLabel.textContent = "Décodage du fichier…";
+    const inputBuffer = await decodeFile(file);
+    drawWaveform(masterWavePreview, inputBuffer);
+
+    progressBar.style.width = "30%"; progressLabel.textContent = "Vérification du compte…";
+    await debitForService("mastering");
+
+    progressBar.style.width = "55%"; progressLabel.textContent = "Égalisation, compression et élargissement stéréo…";
+    const mastered = await masterAudioBuffer(inputBuffer, currentMasterPreset);
+
+    progressBar.style.width = "85%"; progressLabel.textContent = "Encodage du fichier final…";
+    const blob = audioBufferToWav(mastered);
+    const url = URL.createObjectURL(blob);
+    const originalUrl = URL.createObjectURL(file);
+    const analysis = analyzeBuffer(mastered);
+
+    progressBar.style.width = "100%"; progressLabel.textContent = "Terminé !";
+    setTimeout(() => {
+      progressTrack.style.display = "none"; progressLabel.style.display = "none";
+      masterResult.style.display = "block";
+      renderAnalysisPills(document.getElementById("masterAnalysis"), analysis);
+      const audioEl = document.getElementById("resultAudioMaster");
+      audioEl.src = url;
+      document.getElementById("downloadBtnMaster").href = url;
+      const beforeBtn = document.getElementById("masterAbBefore");
+      const afterBtn = document.getElementById("masterAbAfter");
+      const playAt = (btn, otherBtn, src) => {
+        btn.onclick = () => {
+          const wasPlaying = !audioEl.paused;
+          const t = audioEl.currentTime;
+          audioEl.src = src; audioEl.currentTime = t;
+          if (wasPlaying) audioEl.play();
+          btn.classList.add("active"); otherBtn.classList.remove("active");
+        };
+      };
+      playAt(beforeBtn, afterBtn, originalUrl);
+      playAt(afterBtn, beforeBtn, url);
+      afterBtn.classList.add("active"); beforeBtn.classList.remove("active");
+    }, 250);
+  } catch (e) {
+    progressTrack.style.display = "none"; progressLabel.style.display = "none";
+    masterError.textContent = e.code === "paywall" ? e.message
+      : (e.name === "EncodingError" ? "Format audio non supporté ou fichier corrompu." : (e.message || "Une erreur est survenue."));
+    masterError.style.display = "block";
+  } finally {
+    masteringInProgress = false;
+    uploadBoxMaster.style.opacity = "1";
+  }
+}
+
+// ------------------------------------------------------------
+// Instrumental automatique (voix seule → accompagnement synthétisé)
+// ------------------------------------------------------------
+const uploadBoxInstruGen = document.getElementById("uploadBoxInstruGen");
+const fileInputInstruGen = document.getElementById("fileInputInstruGen");
+const instruGenFileChip = document.getElementById("instruGenFileChip");
+let instruGenInProgress = false;
+uploadBoxInstruGen.addEventListener("click", () => { if (!instruGenInProgress) fileInputInstruGen.click(); });
+fileInputInstruGen.addEventListener("change", (e) => { if (e.target.files.length) handleInstruGen(e.target.files[0]); e.target.value = ""; });
+wireDropZone(uploadBoxInstruGen, fileInputInstruGen, (file, err) => {
+  const instruGenError = document.getElementById("instruGenError");
+  if (err) { instruGenError.textContent = err; instruGenError.style.display = "block"; return; }
+  if (!instruGenInProgress) handleInstruGen(file);
+});
+
+async function handleInstruGen(file) {
+  const progressTrack = document.getElementById("progressTrackInstruGen");
+  const progressBar = document.getElementById("progressBarInstruGen");
+  const progressLabel = document.getElementById("progressLabelInstruGen");
+  const instruGenError = document.getElementById("instruGenError");
+  const instruGenResult = document.getElementById("instruGenResult");
+  instruGenError.style.display = "none"; instruGenResult.style.display = "none";
+
+  if (instruGenInProgress) return;
+  if (file.size > MAX_FILE_SIZE) {
+    instruGenError.textContent = "Fichier trop volumineux (60 Mo max).";
+    instruGenError.style.display = "block";
+    return;
+  }
+  instruGenInProgress = true;
+  uploadBoxInstruGen.style.opacity = "0.5";
+  instruGenFileChip.textContent = `${file.name} · ${formatBytes(file.size)}`;
+  instruGenFileChip.classList.add("show");
+  progressTrack.style.display = "block"; progressLabel.style.display = "block";
+
+  try {
+    // Décodage + validation avant tout débit de stars.
+    progressBar.style.width = "10%"; progressLabel.textContent = "Décodage du fichier…";
+    const vocalBuffer = await decodeFile(file);
+    const mono = monoMixdown(vocalBuffer);
+
+    progressBar.style.width = "20%"; progressLabel.textContent = "Vérification du compte…";
+    await debitForService("instrumental");
+
+    progressBar.style.width = "35%"; progressLabel.textContent = "Détection de la tonalité…";
+    const key = detectKey(mono, vocalBuffer.sampleRate);
+
+    progressBar.style.width = "50%"; progressLabel.textContent = "Détection du tempo et du calage…";
+    const { bpm, phase } = detectTempo(mono, vocalBuffer.sampleRate);
+
+    progressBar.style.width = "65%"; progressLabel.textContent = "Composition du style choisi…";
+    const genreKey = document.getElementById("genreSelect").value;
+    const { buffer: rawInstru, actualBpm, styleLabel } = await generateInstrumental(vocalBuffer, key, bpm, genreKey, phase);
+
+    progressBar.style.width = "85%"; progressLabel.textContent = "Mastering de l'instrumental…";
+    const mastered = await masterAudioBuffer(rawInstru, "standard");
+
+    progressBar.style.width = "95%"; progressLabel.textContent = "Encodage du fichier final…";
+    const blob = audioBufferToWav(mastered);
+    const url = URL.createObjectURL(blob);
+    const analysis = analyzeBuffer(mastered);
+
+    progressBar.style.width = "100%"; progressLabel.textContent = "Terminé !";
+    setTimeout(() => {
+      progressTrack.style.display = "none"; progressLabel.style.display = "none";
+      instruGenResult.style.display = "block";
+      document.getElementById("instruGenInfo").textContent =
+        `Style : ${styleLabel} · Tonalité détectée : ${key.name} · Tempo : ${actualBpm} BPM`;
+      renderAnalysisPills(document.getElementById("instruGenAnalysis"), analysis);
+      document.getElementById("resultAudioInstruGen").src = url;
+      document.getElementById("downloadBtnInstruGen").href = url;
+    }, 250);
+  } catch (e) {
+    progressTrack.style.display = "none"; progressLabel.style.display = "none";
+    instruGenError.textContent = e.code === "paywall" ? e.message
+      : (e.name === "EncodingError" ? "Format audio non supporté ou fichier corrompu." : (e.message || "Une erreur est survenue."));
+    instruGenError.style.display = "block";
+  } finally {
+    instruGenInProgress = false;
+    uploadBoxInstruGen.style.opacity = "1";
+  }
+}
+
+// ------------------------------------------------------------
+// Production complète (instru + voix)
+// ------------------------------------------------------------
+let instruFile = null, voixFile = null;
+const uploadBoxInstruEl = document.getElementById("uploadBoxInstru");
+const uploadBoxVoixEl = document.getElementById("uploadBoxVoix");
+const fileInputInstruEl = document.getElementById("fileInputInstru");
+const fileInputVoixEl = document.getElementById("fileInputVoix");
+
+function setInstruFile(file) {
+  if (file.size > MAX_FILE_SIZE) {
+    document.getElementById("prodError").textContent = "Instrumental trop volumineux (60 Mo max).";
+    document.getElementById("prodError").style.display = "block";
+    return;
+  }
+  instruFile = file;
+  document.getElementById("instruFileName").textContent = `${file.name} · ${formatBytes(file.size)}`;
+}
+function setVoixFile(file) {
+  if (file.size > MAX_FILE_SIZE) {
+    document.getElementById("prodError").textContent = "Prise de voix trop volumineuse (60 Mo max).";
+    document.getElementById("prodError").style.display = "block";
+    return;
+  }
+  voixFile = file;
+  document.getElementById("voixFileName").textContent = `${file.name} · ${formatBytes(file.size)}`;
+}
+
+uploadBoxInstruEl.addEventListener("click", () => fileInputInstruEl.click());
+uploadBoxVoixEl.addEventListener("click", () => fileInputVoixEl.click());
+fileInputInstruEl.addEventListener("change", (e) => { if (e.target.files.length) setInstruFile(e.target.files[0]); });
+fileInputVoixEl.addEventListener("change", (e) => { if (e.target.files.length) setVoixFile(e.target.files[0]); });
+wireDropZone(uploadBoxInstruEl, fileInputInstruEl, (file, err) => {
+  const prodError = document.getElementById("prodError");
+  if (err) { prodError.textContent = err; prodError.style.display = "block"; return; }
+  setInstruFile(file);
+});
+wireDropZone(uploadBoxVoixEl, fileInputVoixEl, (file, err) => {
+  const prodError = document.getElementById("prodError");
+  if (err) { prodError.textContent = err; prodError.style.display = "block"; return; }
+  setVoixFile(file);
+});
+
+let productionInProgress = false;
+document.getElementById("launchProductionBtn").addEventListener("click", async () => {
+  const progressTrack = document.getElementById("progressTrackProd");
+  const progressBar = document.getElementById("progressBarProd");
+  const progressLabel = document.getElementById("progressLabelProd");
+  const prodError = document.getElementById("prodError");
+  const prodResult = document.getElementById("prodResult");
+  const launchBtn = document.getElementById("launchProductionBtn");
+  prodError.style.display = "none"; prodResult.style.display = "none";
+
+  if (productionInProgress) return;
+  if (!instruFile || !voixFile) {
+    prodError.textContent = "Ajoute un instrumental ET une prise de voix.";
+    prodError.style.display = "block";
+    return;
+  }
+  productionInProgress = true; launchBtn.disabled = true;
+  progressTrack.style.display = "block"; progressLabel.style.display = "block";
+
+  try {
+    // Décodage + validation des deux fichiers avant tout débit.
+    progressBar.style.width = "10%"; progressLabel.textContent = "Décodage des fichiers…";
+    const instruBuffer = await decodeFile(instruFile);
+    const voixBuffer = await decodeFile(voixFile);
+
+    progressBar.style.width = "25%"; progressLabel.textContent = "Vérification du compte…";
+    await debitForService("production");
+
+    progressBar.style.width = "45%"; progressLabel.textContent = "Mixage instrumental + voix…";
+    const mixed = await mixBuffers(instruBuffer, voixBuffer, instruBuffer.sampleRate);
+
+    progressBar.style.width = "65%"; progressLabel.textContent = "Égalisation, compression et élargissement stéréo…";
+    const mastered = await masterAudioBuffer(mixed, "standard");
+
+    progressBar.style.width = "88%"; progressLabel.textContent = "Encodage du fichier final…";
+    const blob = audioBufferToWav(mastered);
+    const url = URL.createObjectURL(blob);
+    const analysis = analyzeBuffer(mastered);
+
+    progressBar.style.width = "100%"; progressLabel.textContent = "Terminé !";
+    setTimeout(() => {
+      progressTrack.style.display = "none"; progressLabel.style.display = "none";
+      prodResult.style.display = "block";
+      renderAnalysisPills(document.getElementById("prodAnalysis"), analysis);
+      document.getElementById("resultAudioProd").src = url;
+      document.getElementById("downloadBtnProd").href = url;
+    }, 250);
+  } catch (e) {
+    progressTrack.style.display = "none"; progressLabel.style.display = "none";
+    prodError.textContent = e.code === "paywall" ? e.message
+      : (e.name === "EncodingError" ? "Format audio non supporté ou fichier corrompu." : (e.message || "Une erreur est survenue."));
+    prodError.style.display = "block";
+  } finally {
+    productionInProgress = false; launchBtn.disabled = false;
+  }
+});
+
+// ============================================================
+// Signature visuelle : double VU-mètre animé (canvas)
+// ============================================================
+const canvas = document.getElementById("vuCanvas");
+const ctx = canvas.getContext("2d");
+const W = canvas.width, H = canvas.height;
+
+function drawMeter(cx, cy, r, angleDeg) {
+  ctx.save(); ctx.translate(cx, cy);
+  ctx.beginPath(); ctx.arc(0, 0, r, Math.PI * 0.78, Math.PI * 2.22, false);
+  ctx.strokeStyle = "#3a3223"; ctx.lineWidth = 2; ctx.stroke();
+  for (let i = 0; i <= 10; i++) {
+    const a = Math.PI * 0.78 + (Math.PI * 1.44) * (i / 10);
+    const x1 = Math.cos(a) * (r - 8), y1 = Math.sin(a) * (r - 8);
+    const x2 = Math.cos(a) * r, y2 = Math.sin(a) * r;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+    ctx.strokeStyle = i >= 8 ? "#c98a4b" : "#5a5040"; ctx.lineWidth = 1.5; ctx.stroke();
+  }
+  const a = Math.PI * 0.78 + (Math.PI * 1.44) * (angleDeg / 100);
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * (r - 10), Math.sin(a) * (r - 10));
+  ctx.strokeStyle = "#9fc26b"; ctx.lineWidth = 2; ctx.shadowColor = "#9fc26b"; ctx.shadowBlur = 6; ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fillStyle = "#c98a4b"; ctx.fill();
+  ctx.restore();
+}
+
+let t = 0;
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  const spacing = W / 2;
+  const v1 = 55 + Math.sin(t * 0.045) * 22 + Math.sin(t * 0.13) * 8;
+  const v2 = 50 + Math.sin(t * 0.05 + 1.4) * 24 + Math.sin(t * 0.11 + 0.6) * 8;
+  drawMeter(spacing * 0.5, H * 0.68, 78, Math.max(4, Math.min(96, v1)));
+  drawMeter(spacing * 1.5, H * 0.68, 78, Math.max(4, Math.min(96, v2)));
+  t++;
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>
